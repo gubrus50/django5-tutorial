@@ -4,6 +4,11 @@ from django_countries import countries
 
 from django import forms
 from .models import ModelName
+from .utils import get_json_data
+
+# Get SET of abbrevs OF stripe blocked countries JSON
+BLOCKED_COUNTRIES = {entry["abbrev"] for entry in get_json_data("app_name/json/stripe_blocked_countries.json")}
+
 
 
 
@@ -54,6 +59,7 @@ class ContactUsForm(forms.Form):
 
 
 
+
 class PlanForm(forms.Form):
 
     UNIT = '£'
@@ -74,6 +80,8 @@ class PlanForm(forms.Form):
         choices=OPTION,
         required=True
     )
+
+
 
 
 class DonateForm(forms.Form):
@@ -131,6 +139,7 @@ class DonateForm(forms.Form):
         required=True
     )
 
+    """
     line_1 = forms.CharField(
         label='Adres - linia 1',
         max_length=150,
@@ -189,7 +198,7 @@ class DonateForm(forms.Form):
             'id': 'Field-stateInput',
         }),
         required=True
-    )
+    )"""
 
     class Meta:
         # Disclude the '*' suffix from the fields
@@ -205,7 +214,7 @@ class DonateForm(forms.Form):
         # Manually translate country names using Django's gettext
         self.fields['country'].choices = [
             (code, _(name))  # Wrap country name in gettext_lazy
-            for code, name in countries
+            for code, name in countries if code not in BLOCKED_COUNTRIES
         ]
 
         # Select initial county (currently selected)

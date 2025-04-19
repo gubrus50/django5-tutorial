@@ -121,6 +121,8 @@ const isCountriesPostalCodeValid = (countryCode, postalCode) => {
             {{ form.country|as_crispy_field }}
             {{ form.postal_code|as_crispy_field }}
         </div>
+        {% comment %}
+        <!--
         <div class="side-by-side">
             {{ form.line_1|as_crispy_field }}
             {{ form.line_2|as_crispy_field }}
@@ -129,6 +131,8 @@ const isCountriesPostalCodeValid = (countryCode, postalCode) => {
             {{ form.city|as_crispy_field }}
             {{ form.state|as_crispy_field }}
         </div>
+        -->
+        {% endcomment %}
         <script type="text/javascript">
             // Remove <br> nodes from billing-address fields' <label>.
             // And marginate fields vertically like those in Payment Element.
@@ -150,10 +154,14 @@ const isCountriesPostalCodeValid = (countryCode, postalCode) => {
     {% include 'app_name/extensions/stripe/field_error.html' with id_type="numberError" target="#div_id_donation" %}
     {% include 'app_name/extensions/stripe/field_error.html' with id_type="selectError" target="#div_id_country" %}
     {% include 'app_name/extensions/stripe/field_error.html' with id_type="postalCodeError" target="#div_id_postal_code" %}
+    {% comment %}
+    <!--
     {% include 'app_name/extensions/stripe/field_error.html' with id_type="textError" target="#div_id_line_1" %}
     {% include 'app_name/extensions/stripe/field_error.html' with id_type="textError" target="#div_id_line_2" %}
     {% include 'app_name/extensions/stripe/field_error.html' with id_type="textError" target="#div_id_city" %}
     {% include 'app_name/extensions/stripe/field_error.html' with id_type="textError" target="#div_id_state" %}
+    -->
+    {% endcomment %}
     <section class="stripe-agreement mt-3">
         <p>
             Obsługiwane przez 
@@ -219,12 +227,12 @@ const paymentElementOptions = {
     layout: {
         type: 'tabs', // accordion | tabs | auto
         defaultCollapsed: false,
-    },/*
+    },
     fields: {
         billingDetails: {
             address: 'never',
         },
-    }*/
+    }
 };
 const paymentElement = elements.create('payment', paymentElementOptions);
 
@@ -453,7 +461,7 @@ document.addEventListener('htmx:afterRequest', async (event) => {
         confirmParams: {
             return_url: window.location.origin + "{% url 'payment_success' %}",
             /* IF You've disabled billing_details,
-               THEN You must specify payment_method_data manually *//*
+               THEN You must specify payment_method_data manually */
             payment_method_data: {
                 billing_details: {
                     address: {
@@ -469,7 +477,7 @@ document.addEventListener('htmx:afterRequest', async (event) => {
                               || null,
                     },
                 },
-            },*/
+            },
         },
     });
 

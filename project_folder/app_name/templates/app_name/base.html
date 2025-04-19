@@ -1,0 +1,21 @@
+{% load django_bootstrap5 %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="{% if locale %}{{ locale }}{% else %}en{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    {% bootstrap_css %}
+    <script name="htmx.js" src="{% static 'app_name/js/lib/htmx.min.js' %}" defer></script>
+    <script name="htmx-websockets.js" src="{% static 'app_name/js/lib/htmx_websockets.js' %}" defer></script>
+    <script name="hyperscript.js" src="{% static 'app_name/js/lib/hyperscript.min.js' %}" defer></script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% if messages %}{% bootstrap_messages %}{% endif %}
+    <main class="container p-5">{% block content %}{% endblock %}</main>
+    {% bootstrap_javascript %}
+    {% block base %}{% endblock %}
+</body>
+</html>

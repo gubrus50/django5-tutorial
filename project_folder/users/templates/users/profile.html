@@ -1,0 +1,62 @@
+{% extends 'app_name/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Profile Page{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <aside class="col-md-4">
+            <div class="p-3 bg-secondary text-white">
+                <img width="100%" src="{{ profile_user.profile.image.url }}">
+                <p name="surname"></p>
+                <p></p>
+            </div>
+        </aside>
+        <main class="col-md-8">
+            <div class="p-3 bg-light">
+                {% if user.id == profile_user.id %}
+
+                    <form action="{% url 'profile' profile_user.id %}" enctype="multipart/form-data" method="POST">
+                        {% csrf_token %} 
+                        {{ forms.profile|crispy }}
+                        {{ forms.user|crispy }}
+                        <div class="row justify-content-between">
+                            <div class="col-auto">
+                                <button class="btn btn-warning" type="submit">Update Profile</button>
+                            </div>
+                            <div class="col-auto">
+                                <a href="{% url 'password_reset' %}" class="btn btn-link">change password</a>
+                            </div>
+                        </div>
+                    </form>
+
+                {% else %}
+                    {% for field in forms.user %}
+                        {% if field.label|lower != "confirm password" %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            <p class="bg-white p-3" id="{{ field.id_for_label }}">{{ field.value }}</p>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for field in forms.profile %}
+                        {% if field.label|lower != "image" %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            <p class="bg-white p-3" id="{{ field.id_for_label }}">{{ field.value }}</p>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,18 @@
+ 
+# Environments
+project_folder/.env
+project_folder/.venv
+project_folder/env/
+project_folder/venv/
+project_folder/ENV/
+project_folder/env.bak/
+project_folder/venv.bak/
+
+# Node.js
+project_folder/node_modules/
+
+# Ignore SQLite database files
+project_folder/*.sqlite
+project_folder/*.sqlite3
+project_folder/*.db
+project_folder/*.db3

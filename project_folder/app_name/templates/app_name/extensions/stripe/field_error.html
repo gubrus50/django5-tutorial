@@ -1,0 +1,53 @@
+<div class="AnimateSinglePresence" aria-live="polite">
+    <div class="AnimateSinglePresenceItem">
+        <p id="Field-{{ id_type }}" class="p-FieldError Error" role="alert" aria-live="polite">{{ content }}</p>
+    </div>
+    <script type="text/javascript">
+        // private scope wrapper is used to prevent polluting global scope
+        (() => {
+            const target = document.querySelector("{{ target }}"),
+                  script = document.currentScript,
+                  parent = script.parentElement,
+                  field  = parent.querySelector("#Field-{{ id_type }}"),
+                  input  = ("{{ id_type }}" === 'selectError')
+                         ? target.querySelector('select')
+                         : target.querySelector('input');
+
+            input.addEventListener('input', () => {
+                let validity = input.validity;
+
+                if (!validity.valid) {
+                    input.classList.add('Input--invalid');
+                    field.classList.remove('Field--hide');
+                    field.textContent = translateValidity(validity, input);
+                    return;
+                }
+                else if (input.id === 'Field-postalCodeInput') {
+                    let countryParent = document.querySelector(input.dataset.countryParent),
+                        countryInput = countryParent.querySelector('input'),
+                        countryCode = countryInput.value,
+                        postalCode = input.value;
+
+                    // Invalid PostCode
+                    if (!isCountriesPostalCodeValid(countryCode, postalCode)) {
+                        input.classList.add('Input--invalid');
+                        field.classList.remove('Field--hide');
+                        field.textContent = translateValidity({
+                            'invalidPostalCode': true
+                        }, input);
+                        return;
+                    }
+                }
+                // Valid
+                input.classList.remove('Input--invalid');
+                field.classList.add('Field--hide');
+            });
+
+
+            // Append this .AnimateSinglePresence to Target
+            target.appendChild(parent);
+            // Remove this script
+            script.remove();
+        })();
+    </script>
+</div>

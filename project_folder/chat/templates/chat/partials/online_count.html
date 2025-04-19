@@ -1,0 +1,22 @@
+{% with online_count|add:"-1" as online_count %}
+{% load strip_spaces %}
+{% strip %}
+
+<div id="online-status" hx-swap-oob="outerHTML">
+    <span class="icon">
+        {% if online_count > 0 %}🟢
+        {% else %}⚪
+        {% endif %}
+    </span>
+    <span class="online-count
+      {% if online_count > 0 %} text-success
+      {% else %} text-secondary
+      {% endif %}">
+        {% if online_count > 0 %} {{ online_count }}
+        {% else %} 0
+        {% endif %} Online
+    </span>
+</div>
+
+{% endstrip %}
+{% endwith %}

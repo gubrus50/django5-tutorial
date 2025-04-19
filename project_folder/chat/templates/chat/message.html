@@ -1,0 +1,28 @@
+{% load strip_spaces %}
+{% strip %}
+<message>
+
+    <div style="width: clamp(350px, 32vw, 500px)" class="msg-container
+        {% if user == msg.author %} bg-info ms-auto
+        {% else %} bg-secondary me-auto
+        {% endif %} text-white my-4 p-3">
+
+        <p class="msg-body fw-bold">{{ msg.message }}</p>
+
+        <label class="msg-author
+            {% if user == msg.author %} text-end{% else %} w-100{% endif %}">
+            {% if user == msg.author %}Me{% else %}{{ msg.author }}{% endif %}
+        </label>
+    </div>
+
+    <div class="msg-date
+        {% if user == msg.author %} text-end{% else %} text-start{% endif %}">
+        {% if today == msg.created_at|date:"Y-m-d" %}
+            {{ msg.created_at|date:"H:i" }}
+        {% else %}
+            {{ msg.created_at|date:"d M Y, H:i" }}
+        {% endif %}
+    </div>
+
+</message>
+{% endstrip %}

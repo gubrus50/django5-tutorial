@@ -1,0 +1,83 @@
+{% extends 'app_name/base.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block title %}Index Page{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'app_name/css/index.css' %}">
+{% endblock %}
+
+
+{% block content %}
+    <h2 class="mb-5">Welcome to the Index Page!</h2>
+
+    
+    <a href="{% url 'form' %}" class="float-start">add model</a>
+    <a href="{% if request.user.is_authenticated %}{% url 'profile' request.user.id %}{% else %}{% url 'login' %}{% endif %}" class="float-end">
+        <button type="submit" class="btn btn-primary ms-3">profile</button>
+    </a>
+    <form action="{% url 'logout' %}" method="POST" class="float-end">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning">logout</button>
+    </form>
+
+
+    
+    <form action="{% url 'index' %}" enctype="multipart/form-data" method="POST"
+
+        hx-post="{% url 'index' %}"
+        hx-target="#models"
+        hx-trigger="keyup delay:500ms"
+        hx-swap="innerHTML"
+        hx-include="[name='search_query'], [name='creator_value'], [name='country_code_value']"
+    >
+        {% csrf_token %}
+        <div class="input-group py-3">
+            <input type="search" name="search_query" class="form-control rounded-start" placeholder="Search">
+            <button type="submit" class="btn btn-outline-primary text-strong">request search 🔎</button>
+        </div>
+        <div id="filters">
+            <h3 class="fs-4">Include filters in your search</h3>
+            <ul class="list-inline list-unstyled py-2">
+                <li class="list-inline-item">
+                    <label for="creator_empty">no creator:</label>
+                    <input type="radio" name="creator" id="creator_empty" checked>
+                </li>
+                <li class="list-inline-item">
+                    <label for="creator_username">creator username:</label>
+                    <input type="radio" name="creator" id="creator_username">
+                </li>
+                <li class="list-inline-item">
+                    <label for="creator_id">creator id:</label>
+                    <input type="radio" name="creator" id="creator_id">
+                </li>
+                <li class="mt-2">
+                    <input type="text" name="creator_username_value" id="creator_value" class="form-control mt-2" placeholder="Enter model creator's username" disabled hidden>
+                    <input type="text" name="creator_id_value" id="creator_value" class="form-control mt-2" placeholder="Enter model creator's ID" disabled hidden>
+                </li>
+                <li class="my-2">
+                    <label for="country_code">country code:</label>
+                    <input type="checkbox" name="country_code" id="country_code">
+                    <input type="text" name="country_code_value" id="country_code_value" class="form-control mt-2" placeholder="Enter model's country code" disabled>
+                </li>
+            </ul>
+        </div>
+    </form>
+    
+    <hr class="pt-3">
+
+    {% if models %}
+        <ul id="models" class="list-group pb-3">
+            {% include 'app_name/extensions/models_list.html' %}
+        </ul>
+    {% endif %}
+   
+{% endblock %}
+
+
+
+
+{% block base %}
+<script name="search.js" src="{% static 'app_name/js/search.js' %}" defer></script>
+{% endblock %}

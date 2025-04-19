@@ -1,0 +1,199 @@
+{% extends 'app_name/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}Checkout Page{% endblock %}
+
+{% block head %}
+<style>
+
+form * {
+    font-family: "Helvetica Neue", Helvetica, sans-serif; 
+}
+
+.stripe-agreement {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #333;
+    padding: 15px 20px;
+    background-color: #f9fafb;
+    border-top: 1px solid #ddd;
+}
+.stripe-agreement a {
+    color: #0070ba;
+    text-decoration: none;
+}
+.stripe-agreement a:hover {
+    text-decoration: underline;
+}
+.stripe-agreement p {
+    margin: 0;
+}
+
+</style>
+<script name="stripe.js" src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+
+
+{% block content %}
+
+<h1>Pay Now</h1>
+<hr>
+<h2 id="total-cost" class="display-3 fw-bold text-primary mb-0">
+{{ payment_unit }}{{ display_price|floatformat:2 }}
+</h2>
+
+<form id="payment-form"
+      action="{% url 'buy_plan' %}"
+      method="POST"
+      data-secret="{{ client_secret }}">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div id="card-element" class="form-control p-3">
+        <!-- Elements will create form elements here -->
+    </div>
+    <section class="stripe-agreement mt-3">
+        <p>
+            Powered by 
+            <a href="https://stripe.com" target="_blank">Stripe</a>.
+            By proceeding, you agree to 
+            <a href="https://stripe.com/legal" target="_blank">Terms of Service</a>
+            and 
+            <a href="https://stripe.com/privacy" target="_blank">Privacy Policy</a>.
+        </p>
+    </section>
+    <button type="submit" id="submit-button" class="btn btn-primary fw-bold my-3 p-3">
+        Proceed with payment
+    </button>
+    <div id="card-errors" role="alert" class="text-danger">
+        <!-- Display error message to your customers here -->
+    </div>
+</form>
+
+
+{% endblock %}
+
+
+
+
+{% block base %}
+<script name="select-plan-form" type="text/javascript">
+
+const objPlans = {{ plans|safe }};
+let elmTotalCost = elmSelectPlan = undefined;
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    elmTotalCost = document.getElementById('total-cost');
+    elmSelectPlan = document.querySelector('select[name="plan"]');
+    elmSelectPlan.classList.add('p-3');
+
+    elmSelectPlan.addEventListener('change', (event) => {
+        const totalCost = objPlans[event.target.value] || 0;
+        elmTotalCost.innerHTML = `{{ payment_unit }}${totalCost.toFixed(2)}`;
+    });
+
+});
+
+</script>
+<script name="stripe-payment-form" type="text/javascript">
+
+// Initialize Stripe with your publishable key
+const stripe = Stripe('{{ stripe_public }}');
+// Create an instance of Elements
+const elements = stripe.elements();
+
+// Options for customizing the Card Element styles
+const style = {
+    base: {
+        color: "#32325d",
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: "antialiased",
+        fontSize: "20px",
+        "::placeholder": {
+            color: "#aab7c4",
+        },
+    },
+    invalid: {
+        color: "#fa755a",
+        iconColor: "#fa755a",
+    },
+};
+
+// Create an instance of the Card Element
+const card = elements.create("card", { style });
+// Add the Card Element to the page
+card.mount("#card-element");
+
+
+
+
+
+
+
+
+const form = document.getElementById("payment-form");
+const errorElement = document.getElementById("card-errors");
+
+
+
+// Handle real-time validation errors
+card.on("change", (event) => {
+    errorElement.textContent = (event.error) ? event.error.message : "";
+});
+
+
+
+// Handle form submission
+form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+
+
+    const formData = new FormData();
+    formData.append("plan", elmSelectPlan.value);
+
+    // Send the selected plan to the backend
+    const response = await fetch("{% url 'buy_plan_intent' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+        },
+        body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        // Handle errors returned from the backend
+        errorElement.textContent = data.error;
+    }
+
+
+
+    const clientSecret = data.client_secret;
+
+    // Confirm the card payment
+    const { error } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+            card: card,
+        },
+    });
+
+    if (error) {
+        // Handle errors from the stripe card payment
+        errorElement.textContent = error.message;
+    } else {
+        // The card has been paid successfully
+        // Reset form inputs
+        card.clear();
+        form.reset();
+
+        // Redirect to the success page
+        window.location.href = "{% url 'payment_success' %}";
+    }
+
+});
+
+</script>
+{% endblock %}

@@ -1,0 +1,490 @@
+{% extends 'app_name/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}Strona Dotacji{% endblock %}
+
+{% block head %}
+<link name="flag-icons.min.css" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@latest/css/flag-icons.min.css">
+<link name="DynamicSelect.css" rel="stylesheet" href="{% static 'app_name/css/lib/dynamic_select.css' %}">
+<link name="stripe.css" rel="stylesheet" href="{% static 'app_name/css/stripe.css' %}">
+<style>
+
+#mounting:not(.mounted), [id^="div_id_"]:not(.mounted) { display: none; }
+
+.form-control {
+    height: 56.39px !important;
+}
+
+.side-by-side > div {
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: auto;
+    width: 100%;
+    transition: all 1.25s cubic-bezier(0.68, -0.55, 0.27, 1.55), margin 0.1s ease-out;
+}
+
+.smooth-collapse {
+    width: 0px !important;
+    opacity: 0;
+}
+.smooth-collapse[data-width="0"] {
+    margin: 0px !important;
+    position: absolute;
+}
+
+/* Desktop - space between */
+@media (min-width: 767px) {
+    .side-by-side {
+        display: flex;
+    }
+    .side-by-side > div:last-child {
+        margin-left: 20px; /* This replaces the spacing div */
+    }
+}
+
+/* Mobile - stack */
+@media (max-width: 766px) {
+    .side-by-side > div:last-child {
+        margin-top: 10px; /* Space between stacked containers */
+        margin-left: 0;
+    }
+}
+
+.dynamic-select img {
+    border-radius: 5px;
+    border: 1px solid #d4d7da;
+}
+
+</style>
+<script name="stripe.js" src="https://js.stripe.com/v3/"></script>
+<script name="DynamicSelect.js" src="{% static 'app_name/js/lib/dynamic_select.js' %}"></script>
+<script name="translate-validity-pl.js" src="{% static 'app_name/js/translate_validity_pl.js' %}"></script>
+<script name="postal-code-validation" type="text/javascript">
+
+let POSTAL_CODES_REGEXP;
+
+fetch("{% static 'app_name/json/postal_codes_regexp.json' %}")
+    .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        POSTAL_CODES_REGEXP = data;
+    })
+    .catch(error => console.error("Error:", error));
+
+
+    
+const isCountriesPostalCodeValid = (countryCode, postalCode) => {
+
+    let isValid = false;
+
+    POSTAL_CODES_REGEXP.forEach(obj => {
+        if (countryCode.toLowerCase() === obj.abbrev.toLowerCase()) {
+            // Return if postal-code doesn't match regex
+            if (!postalCode.match(new RegExp(obj.postal || ""))) return;
+            // Is valid if postal-code matches the regexp-example-length
+            if (obj.example) {
+                if (obj.example.length == postalCode.length) isValid = true;
+                else return;
+            }
+            // Is valid if postal-code is not empty
+            isValid = (postalCode.length > 0);
+        }
+    });
+
+    return isValid;
+}
+
+</script>
+{% endblock %}
+
+
+
+{% block content %}
+<h1>Wesprzyj Nas</h1>
+<hr>
+<h2 id="total-cost" class="display-3 fw-bold text-primary mb-0">
+<span class="value">{{ display_price|floatformat:2 }}</span>{{ payment_unit }}
+</h2>
+
+<form id="payment-form" data-secret="{{ client_secret }}">
+    {% csrf_token %}
+
+    {% include 'app_name/extensions/stripe/extended_mounting.html' %}
+    {{ form.donation|as_crispy_field }}
+    <div id="payment-element">
+        <!-- Elements will create form elements here -->
+    </div>
+    <div id="billing-address" class="p-0 m-0">
+        <div class="side-by-side">
+            {{ form.country|as_crispy_field }}
+            {{ form.postal_code|as_crispy_field }}
+        </div>
+        <div class="side-by-side">
+            {{ form.line_1|as_crispy_field }}
+            {{ form.line_2|as_crispy_field }}
+        </div>
+        <div class="side-by-side">
+            {{ form.city|as_crispy_field }}
+            {{ form.state|as_crispy_field }}
+        </div>
+        <script type="text/javascript">
+            // Remove <br> nodes from billing-address fields' <label>.
+            // And marginate fields vertically like those in Payment Element.
+            (() => {
+                let script = document.currentScript,
+                    fields = script.parentElement.querySelectorAll('[id^="div_id_"]'),
+                    label  = null;
+
+                [...fields].map(field => {
+                    field.classList.replace('mb-3', 'my-3');
+                    label = field.querySelector('label.form-label');
+                    label.innerHTML = label.innerText.trim();
+                });
+
+                script.remove();
+            })();
+        </script>
+    </div>
+    {% include 'app_name/extensions/stripe/field_error.html' with id_type="numberError" target="#div_id_donation" %}
+    {% include 'app_name/extensions/stripe/field_error.html' with id_type="selectError" target="#div_id_country" %}
+    {% include 'app_name/extensions/stripe/field_error.html' with id_type="postalCodeError" target="#div_id_postal_code" %}
+    {% include 'app_name/extensions/stripe/field_error.html' with id_type="textError" target="#div_id_line_1" %}
+    {% include 'app_name/extensions/stripe/field_error.html' with id_type="textError" target="#div_id_line_2" %}
+    {% include 'app_name/extensions/stripe/field_error.html' with id_type="textError" target="#div_id_city" %}
+    {% include 'app_name/extensions/stripe/field_error.html' with id_type="textError" target="#div_id_state" %}
+    <section class="stripe-agreement mt-3">
+        <p>
+            Obsługiwane przez 
+            <a href="https://stripe.com" target="_blank">Stripe</a>.
+            Kontynuując, akceptujesz
+            <a href="https://stripe.com/legal" target="_blank">Warunki korzystania z usługi</a>
+            i
+            <a href="https://stripe.com/privacy" target="_blank">Politykę prywatności</a>.
+        </p>
+    </section>
+    <button type="submit" id="submit-button" class="btn btn-primary fw-bold my-3 p-3"
+        hx-post="{% url 'donate_update_intent' %}"
+        hx-trigger="click delay:500ms"
+        hx-swap="none">
+        Kontynuuj płatność
+    </button>
+    <div id="error-message" role="alert" class="text-danger">
+        <!-- Display error message to your customers here -->
+    </div>
+</form>
+{% endblock %}
+
+
+
+
+{% block base %}
+<script name="stripe-payment-form" type="text/javascript">
+
+
+/* --- 3. Collect payment details --- */
+
+// https://docs.stripe.com/payments/checkout/customization/appearance?payment-ui=embedded-components#all-rules
+
+
+// Set your publishable key: remember to change this to your live publishable key in production
+// See your keys here: https://dashboard.stripe.com/apikeys
+const stripe = Stripe('{{ stripe_public }}');
+
+const options = {
+    clientSecret: '{{ client_secret }}',
+    locale: '{{ locale }}',
+    // Fully customizable with appearance API.
+    appearance: {
+        theme: 'tabs', // stripe | tabs | night (NOTE: variables modify the theme)
+        variables: {
+            colorPrimary: '#0570de',
+            colorBackground: '#ffffff',
+            colorText: '#30313d',
+            colorDanger: '#df1b41',
+            fontFamily: 'Ideal Sans, system-ui, sans-serif',
+            spacingUnit: '6px',
+            borderRadius: '4px',
+        },
+    },
+};
+
+// Set up Stripe.js and Elements to use in checkout form,
+// passing the client secret obtained in a previous step
+const elements = stripe.elements(options);
+
+// Create Payment Element
+const paymentElementOptions = {
+    layout: {
+        type: 'tabs', // accordion | tabs | auto
+        defaultCollapsed: false,
+    },
+    fields: {
+        billingDetails: {
+            address: 'never',
+        },
+    }
+};
+const paymentElement = elements.create('payment', paymentElementOptions);
+
+
+
+
+
+
+
+
+/* --- Show custom <input> "Donation" --- */
+
+// NOTE: This is NOT part of Stripe's documentation
+
+// Update #total-cost (label) when price is changed on input[name="donation"]
+const labelTotal = document.getElementById('total-cost'),
+      valueTotal = labelTotal.querySelector('.value'),
+      parentDonation = document.querySelector('#div_id_donation'),
+      inputDonation = parentDonation.querySelector('input[name="donation"]');
+
+inputDonation.addEventListener('input', () => {
+    let value = parseFloat(inputDonation.value);
+
+    value = isNaN(value) ? 0 : value;
+    valueTotal.innerText = value.toFixed(2).replace('.',',');
+
+    inputDonation.classList.contains('Input--invalid')
+        ? labelTotal.classList.add('text-danger')
+        : labelTotal.classList.remove('text-danger');
+});
+
+
+function refreshLoaderAnimation() {
+    const loaders = [...document.querySelectorAll('.loader')];
+
+    loaders.map(loader => {
+        // Get clone of the loader with initial X position: -100%
+        const parent = loader.parentNode;
+        const clone = loader.cloneNode(true);
+        clone.style.transform = 'translateX(-100%)';
+            
+        // Remove the original 'loader' element and re-attach it
+        parent.removeChild(loader);
+        parent.appendChild(clone);
+        // Start slide-transition animation after 1 second
+        setTimeout(() => {
+            clone.style.transform = 'translateX(200%)';
+        }, 0);
+    });
+}
+
+// Select the target node
+const targetNode = document.getElementById('payment-element');
+
+// Create an instance of MutationObserver
+const observer = new MutationObserver((mutationsList) => {
+     mutationsList.forEach((mutation) => {
+        const privateStripeLoader = targetNode.querySelector('.__PrivateStripeElementLoader');
+        if (!privateStripeLoader) return;
+
+        // Start the loader animation at #mounting
+        refreshLoaderAnimation();
+        setInterval(refreshLoaderAnimation, 3500);
+        document.getElementById('mounting').classList.add('mounted');
+        observer.disconnect();
+    });
+});
+
+observer.observe(targetNode, {childList: true, subtree: true });
+
+// Mount Donation & Billing Address (Fields), once paymentElement is ready
+paymentElement.on('ready', () => {
+
+    // --- Include flag-icons TO <select> country (using DynamicSelect)
+
+    const __flags = "{% static 'app_name/img/flags/4x3' %}",
+          country = document.querySelector('#div_id_country > select'),
+          options = country.querySelectorAll('option');
+    
+    [...options].map(option => { // NOTE: 'xx' is empty/white flag
+        let countryCode = (option.value || 'xx').toLowerCase();
+        option.dataset.img = __flags + `/${countryCode}.svg`;
+    });
+
+
+
+    let parentPC = document.querySelector('#div_id_postal_code'),
+        inputPC = document.querySelector('#div_id_postal_code > input'),
+        fieldPC = document.querySelector('#Field-postalCodeError'),
+        limitPC = inputPC.getAttribute('maxlength');
+
+    // Set initial maxlength for postal-code input, based on selected country
+    POSTAL_CODES_REGEXP.forEach(obj => {
+        if (obj.abbrev.toLowerCase() !== country.value.toLowerCase()) return;
+        else if (limitPC) inputPC.setAttribute('maxlength', obj.example.length ?? limitPC);
+    });
+
+    
+    // https://github.com/gubrus50/dynamic-select-images-js
+    new DynamicSelect('#div_id_country > select', {
+        class: 'form-control px-0',
+        selectedStyle: 'border: 0',
+        onChange: function updateAndValidatePostalCode(value, text, option)
+        {
+            POSTAL_CODES_REGEXP.forEach(obj => {
+                // Return if country doesn't match
+                if (obj.abbrev.toLowerCase() !== value.toLowerCase()) return;
+                // Hide & disable #div_id_postal_code IF obj has no postal-code
+                if (!obj.postal) {
+                    inputPC.setAttribute('disabled', '');
+                    inputPC.setAttribute('aria-required', false);
+                    parentPC.classList.add('smooth-collapse');
+                    return;
+                }
+                // Otherwise, show & enable #div_id_postal_code
+                else if (inputPC.hasAttribute('disabled')) {
+                    inputPC.removeAttribute('disabled');
+                    inputPC.setAttribute('aria-required', true);
+                    parentPC.classList.remove('smooth-collapse');
+                }
+                // Update placeholder and maxlength for postal-code <input>
+                inputPC.setAttribute('placeholder', obj.example ?? '');          
+                if (limitPC) inputPC.setAttribute('maxlength', obj.example.length ?? limitPC);
+
+                // Clear postal-code <input>, and hide invalid field
+                inputPC.value = '';
+                inputPC.classList.remove('Input--invalid');
+                fieldPC.classList.add('Field--hide');
+            });
+
+            // Hide invalid field of <dynamic-select> and danger highlight
+            let input = document.querySelector('#div_id_country input');
+            if (input && input.value.length)
+            {
+                let parent = document.querySelector('#div_id_country'),
+                    select = parent.querySelector('dynamic-select'),
+                    field  = parent.querySelector('.p-FieldError');
+                    
+                select.classList.remove('Input--invalid');
+                field.classList.add('Field--hide');
+            }
+        }
+    });
+
+    // Update data-width of #div_id_postal_code (used for transition animation)
+    setInterval(() => { parentPC.dataset.width = parentPC.clientWidth }, 10);
+    
+
+
+    // Remove #mounting with .loader(s)
+    document.getElementById('mounting').remove();
+    clearInterval(refreshLoaderAnimation);
+    
+    // Mount/Show the crispy_form divs
+    const crispyFormDivs = document.querySelectorAll('[id^="div_id_"]');
+
+    [...crispyFormDivs].map(div => {
+        // Remove '*' from label
+        let label = div.querySelector('label');
+        label.innerText = label.innerText.replace('*', '');
+        // Add class mounted
+        div.classList.add('mounted');
+    });
+});
+
+// Mount/Show the Payment Element
+paymentElement.mount('#payment-element');
+
+
+
+
+
+
+
+
+
+
+
+/* --- 4. Submit the payment to Stripe --- */
+
+const form = document.getElementById('payment-form');
+const errorElement = document.querySelector('#error-message');
+
+document.addEventListener('htmx:afterRequest', async (event) => {
+    
+    // Receive response from the backend
+    let responseText = await event.detail.xhr.responseText,
+        response = JSON.parse(responseText),
+        formErrors = response.form_errors;
+    
+    // Display error labels for invalid <input>(s) of DonateForm
+    if (formErrors) {
+        // DynamicSelect initialization takes place after DOM parsing.
+        // Hence, collecting, up-to-date, inputNames. 
+        const inputNames = [...form.querySelectorAll('input')].map(input => input.name);
+
+        inputNames.forEach(name => {
+            if (!formErrors.hasOwnProperty(name)) return;
+
+            let parent = document.querySelector(`#div_id_${name}`),
+                field  = parent.querySelector('.p-FieldError'),
+                input  = parent.querySelector(`input[name="${name}"]`);
+
+            field.innerText = formErrors[name][0];
+            field.classList.remove('Field--hide');
+            input.classList.add('Input--invalid');
+            
+            if (parent.querySelector('dynamic-select')) {
+                parent.querySelector('dynamic-select')
+                .classList.add('Input--invalid');
+            }
+        });
+    }
+    if (response.error) {
+        // Failure of Payment Intent's modification in the backend.
+        // Hence, it is important to prevent further code executions.
+        // Otherwise, client may proceed with the initial donation price,
+        errorElement.textContent = response.error;
+        throw new Error(response.error);
+    }
+
+
+    const {error} = await stripe.confirmPayment({
+        //`Elements` instance that was used to create the Payment Element
+        elements,
+        confirmParams: {
+            return_url: window.location.origin + "{% url 'payment_success' %}",
+            /* IF You've disabled billing_details,
+               THEN You must specify payment_method_data manually */
+            payment_method_data: {
+                billing_details: {
+                    address: {
+                        // Get, required for Stripe API, billing data
+                        line1: document.querySelector('#div_id_line_1 > input:not(:disabled)')?.value || null,
+                        line2: document.querySelector('#div_id_line_2 > input:not(:disabled)')?.value || null,
+                        city : document.querySelector('#div_id_city   > input:not(:disabled)')?.value || null,
+                        state: document.querySelector('#div_id_state  > input:not(:disabled)')?.value || null,
+                        postal_code: document.querySelector('#div_id_postal_code > input:not(:disabled)')?.value || null,
+                        // Get the appropriate country code (e.g., 'GB' for the United Kingdom)
+                        country: document.querySelector('#div_id_country input[name="country"]:not(:disabled)')?.value
+                              || document.querySelector('#div_id_country > select:not(:disabled)')?.value
+                              || null,
+                    },
+                },
+            },
+        },
+    });
+
+    if (error) {
+        // This point will only be reached if there is an immediate error when
+        // confirming the payment. Show error to your customer (for example, payment
+        // details incomplete)
+        errorElement.textContent = error.message;
+    }
+    else {
+        // Your customer will be redirected to your `return_url`. For some payment
+        // methods like iDEAL, your customer will be redirected to an intermediate
+        // site first to authorize the payment, then redirected to the `return_url`.
+    }
+});
+
+</script>
+{% endblock %}

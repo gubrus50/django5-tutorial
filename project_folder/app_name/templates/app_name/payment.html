@@ -1,0 +1,135 @@
+{% extends 'app_name/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %}Checkout Page{% endblock %}
+
+{% block head %}
+<script name="stripe.js" src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
+
+
+{% block content %}
+
+<h1>Pay Now</h1>
+<hr>
+<h2 class="display-3 fw-bold text-primary mb-0">£{{ display_price|floatformat:2 }}</h2>
+
+<form id="payment-form"
+      action="{% url 'payment' %}"
+      method="POST"
+      data-secret="{{ client_secret }}">
+    {% csrf_token %}
+    <div id="payment-element">
+        <!-- Elements will create form elements here -->
+    </div>
+    <button type="submit" id="submit" class="btn btn-primary fw-bold mt-3 p-3">
+        Proceed to payment
+    </button>
+    <div id="error-message">
+        <!-- Display error message to your customers here -->
+    </div>
+</form>
+
+{% endblock %}
+
+
+
+
+{% block base %}
+
+<script name="payment-element" type="text/javascript">
+
+/* --- 3. Collect payment details --- */
+
+// https://docs.stripe.com/payments/checkout/customization/appearance?payment-ui=embedded-components#all-rules
+
+
+// Set your publishable key: remember to change this to your live publishable key in production
+// See your keys here: https://dashboard.stripe.com/apikeys
+const stripe = Stripe('{{ stripe_public }}');
+
+const options = {
+    clientSecret: '{{ client_secret }}',
+    // Fully customizable with appearance API.
+    appearance: {
+        theme: 'tabs', // stripe | tabs | night (NOTE: variables modify the theme)
+        variables: {
+            colorPrimary: '#0570de',
+            colorBackground: '#ffffff',
+            colorText: '#30313d',
+            colorDanger: '#df1b41',
+            fontFamily: 'Ideal Sans, system-ui, sans-serif',
+            spacingUnit: '6px',
+            borderRadius: '4px',
+            // See all possible variables below
+        }
+    },
+};
+
+// Set up Stripe.js and Elements to use in checkout form, passing the client secret obtained in a previous step
+const elements = stripe.elements(options);
+
+// Create and mount the Payment Element
+const paymentElementOptions = {
+    layout: {
+        type: 'tabs',
+        defaultCollapsed: false,
+    },
+    /*
+    fields: {
+        billingDetails: {
+            // Disable country and postal code fields for all payment methods
+            address: {
+                country: 'never',
+                postalCode: 'never'
+            }
+        }
+    }
+    */
+};
+const paymentElement = elements.create('payment', paymentElementOptions);
+paymentElement.mount('#payment-element');
+
+
+
+/* --- 4. Submit the payment to Strip --- */
+
+const form = document.getElementById('payment-form');
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const {error} = await stripe.confirmPayment({
+    //`Elements` instance that was used to create the Payment Element
+    elements,
+    confirmParams: {
+        return_url: window.location.origin + "{% url 'payment_success' display_price %}",
+        /*
+        payment_method_data: {
+            billing_details: {
+                address: {
+                    country: 'GB', // Provide the appropriate country code (e.g., 'GB' for the United Kingdom)
+                    postal_code: 'KY1 2LY' // Replace with the actual postal code for the billing address
+                }
+            }
+        }
+        */
+    },
+  });
+
+  if (error) {
+    // This point will only be reached if there is an immediate error when
+    // confirming the payment. Show error to your customer (for example, payment
+    // details incomplete)
+    const messageContainer = document.querySelector('#error-message');
+    messageContainer.textContent = error.message;
+  } else {
+    // Your customer will be redirected to your `return_url`. For some payment
+    // methods like iDEAL, your customer will be redirected to an intermediate
+    // site first to authorize the payment, then redirected to the `return_url`.
+  }
+});
+
+</script>
+{% endblock %}

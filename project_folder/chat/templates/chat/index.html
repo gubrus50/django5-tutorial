@@ -1,0 +1,63 @@
+{% extends 'app_name/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+
+
+{% block content %}
+
+<h1>{{ room_name|title }}</h1>
+<hr>
+<div id="online-status" class="text-primary">
+    <span class="spinner-grow spinner-grow-sm"></span>
+    <span role="status">Connecting...</span>
+</div>
+<hr>
+
+{% if request.user.is_authenticated %}
+
+    <section id="chat-messages" class="overflow-auto" style="height: 50vh">
+        {% if room_messages %}
+            {% for msg in room_messages reversed %}
+                {% include 'chat/message.html' %}
+            {% endfor %}
+        {% endif %}
+    </section>
+
+    <hr class="my-5">
+    
+    <form id="chat-form"
+        hx-ext="ws"
+        ws-connect="/ws/chatroom/public/"
+        ws-send>
+        {% csrf_token %}
+        {{ form|crispy }}
+    </form>
+
+{% endif %}
+{% endblock %}
+
+
+
+{% block base %}
+<script name="chat-messages.js" type="text/javascript">
+
+const chatForm = document.getElementById('chat-form');
+const chatMessages = document.getElementById('chat-messages');
+
+const scrollToBottom = () => {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+const observer = new MutationObserver(scrollToBottom);
+observer.observe(chatMessages, { childList: true });
+
+document.addEventListener('htmx:wsAfterSend', () => {
+    chatForm.reset();
+    scrollToBottom();
+});
+
+scrollToBottom();
+
+</script>
+{% endblock %}

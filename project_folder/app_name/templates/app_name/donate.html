@@ -219,12 +219,12 @@ const paymentElementOptions = {
     layout: {
         type: 'tabs', // accordion | tabs | auto
         defaultCollapsed: false,
-    },
+    },/*
     fields: {
         billingDetails: {
             address: 'never',
         },
-    }
+    }*/
 };
 const paymentElement = elements.create('payment', paymentElementOptions);
 
@@ -453,7 +453,7 @@ document.addEventListener('htmx:afterRequest', async (event) => {
         confirmParams: {
             return_url: window.location.origin + "{% url 'payment_success' %}",
             /* IF You've disabled billing_details,
-               THEN You must specify payment_method_data manually */
+               THEN You must specify payment_method_data manually *//*
             payment_method_data: {
                 billing_details: {
                     address: {
@@ -469,7 +469,7 @@ document.addEventListener('htmx:afterRequest', async (event) => {
                               || null,
                     },
                 },
-            },
+            },*/
         },
     });
 

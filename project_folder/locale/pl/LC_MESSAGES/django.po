@@ -266,6 +266,12 @@ msgstr "Haiti"
 msgid "Honduras"
 msgstr "Honduras"
 
+msgid "Hong Kong"
+msgstr "SRA Hongkong (Chiny)"
+
+msgid "Hongkong"
+msgstr "SRA Hongkong (Chiny)"
+
 msgid "Hungary"
 msgstr "Węgry"
 
@@ -352,6 +358,9 @@ msgstr "Litwa"
 
 msgid "Luxembourg"
 msgstr "Luksemburg"
+
+msgid "Macao"
+msgstr "SRA Makau (Chiny)"
 
 msgid "Macedonia"
 msgstr "Macedonia"

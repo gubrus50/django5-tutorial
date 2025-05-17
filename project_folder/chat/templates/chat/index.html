@@ -6,12 +6,28 @@
 
 {% block content %}
 
-<h1>{{ room_name|title }}</h1>
-<hr>
-<div id="online-status" class="text-primary">
-    <span class="spinner-grow spinner-grow-sm"></span>
-    <span role="status">Connecting...</span>
-</div>
+<!-- Added below dropdown -->
+{% include 'chat/includes/my_chats.html' with div_class="float-end" %}
+
+
+{% comment %}
+<!-- This below script has been updated
+Included if statement to add other_user
+Moved 1 <hr> near #online-status TO outside the if statement -->
+{% endcomment %}
+{% if other_user %}
+    <a class="float-start" href="{% url 'profile' other_user.id %}">
+        <img width="75px" class="rounded-circle bg-light me-2" src="{{ other_user.profile.image.url }}">
+    </a>
+    <h2>{{ other_user.username }}</h2>
+{% else %}
+    <h1>{{ room_name|title }}</h1>
+    <hr>
+    <div id="online-status" class="text-primary">
+        <span class="spinner-grow spinner-grow-sm"></span>
+        <span role="status">Connecting...</span>
+    </div>
+{% endif %}
 <hr>
 
 {% if request.user.is_authenticated %}
@@ -28,7 +44,7 @@
     
     <form id="chat-form"
         hx-ext="ws"
-        ws-connect="/ws/chatroom/public/"
+        ws-connect="/ws/chatroom/{{ room_name }}/" {# replaced 'public' with '{room_name}' #}
         ws-send>
         {% csrf_token %}
         {{ form|crispy }}

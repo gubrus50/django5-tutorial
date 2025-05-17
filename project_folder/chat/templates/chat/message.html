@@ -3,13 +3,13 @@
 <message>
 
     <div style="width: clamp(350px, 32vw, 500px)" class="msg-container
-        {% if user == msg.author %} bg-info ms-auto
-        {% else %} bg-secondary me-auto
-        {% endif %} text-white my-4 p-3">
+        {% if user == msg.author %} text-white bg-info ms-auto
+        {% else %} bg-light me-auto
+        {% endif %} my-4 p-3">
 
-        <p class="msg-body fw-bold">{{ msg.message }}</p>
+        <p class="msg-body">{{ msg.message }}</p>
 
-        <label class="msg-author
+        <label class="msg-author fw-bold
             {% if user == msg.author %} text-end{% else %} w-100{% endif %}">
             {% if user == msg.author %}Me{% else %}{{ msg.author }}{% endif %}
         </label>

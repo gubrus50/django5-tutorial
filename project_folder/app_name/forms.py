@@ -6,7 +6,7 @@ from django import forms
 from .models import ModelName
 from .utils import get_json_data
 
-# Get SET of abbrevs OF stripe blocked countries JSON
+# Get SET of abbrevs OF stripe blocked countries JSON - {“AB”, “CD”, “EF” ...}
 BLOCKED_COUNTRIES = {entry["abbrev"] for entry in get_json_data("app_name/json/stripe_blocked_countries.json")}
 
 

@@ -1,0 +1,34 @@
+{% load strip_spaces %}
+{% strip %}
+<div class="dropdown {{ div_class }}">
+
+    <button type="button"
+      id="dropdownMenuButton1"
+      class="btn dropdown-toggle
+        {% if button_class %} {{ button_class }}
+        {% else %} btn-light
+        {% endif %}"
+      data-bs-toggle="dropdown"
+      aria-expanded="false">
+        My Chats
+    </button>
+
+    <ul class="dropdown-menu {{ ul_class }}" aria-labelledby="dropdownMenuButton1">
+        {% for room in user.chat_rooms.all %}
+            {% if room.is_private %}
+                {% for member in room.members.all %}
+                    {% if member != user %}
+                        <li>
+                            <a class="dropdown-item"
+                               href="{% url 'chatroom' room.name %}">
+                                {{ member }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </ul>
+    
+</div>
+{% endstrip %}

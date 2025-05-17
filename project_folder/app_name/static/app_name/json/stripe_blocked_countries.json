@@ -1,27 +1,31 @@
 [
     {
-        "abbrev": "IR",
-        "name": "Iran"
-    },
-    {
         "abbrev": "CU",
         "name": "Cuba"
     },
     {
-        "abbrev": "UA-CR",
-        "name": "Crimea"
+        "abbrev": "IR",
+        "name": "Iran"
     },
     {
         "abbrev": "KP",
         "name": "North Korea"
     },
     {
-        "abbrev": "UA-DN",
-        "name": "Donetsk"
+        "abbrev": "RU",
+        "name": "Russian Federation"
     },
     {
         "abbrev": "SY",
         "name": "Syria"
+    },
+    {
+        "abbrev": "UA-CR",
+        "name": "Crimea"
+    },
+    {
+        "abbrev": "UA-DN",
+        "name": "Donetsk"
     },
     {
         "abbrev": "UA-LU",

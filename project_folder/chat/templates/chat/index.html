@@ -38,7 +38,7 @@
     
     <form id="chat-form"
         hx-ext="ws"
-        ws-connect="/ws/chatroom/{{ room_name }}/" {# replaced 'public' with '{room_name}' #}
+        ws-connect="/ws/chatroom/{{ room_name }}/"
         ws-send>
         {% csrf_token %}
         {{ form|crispy }}

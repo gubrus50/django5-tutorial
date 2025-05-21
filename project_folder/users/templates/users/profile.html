@@ -12,7 +12,6 @@
             <div class="p-3 bg-secondary text-white">
                 <img width="100%" src="{{ profile_user.profile.image.url }}">
             </div>
-            <!-- Added below if statement -->
             {% if profile_user != request.user %}
                 <a class="btn btn-secondary rounded-0 border-top w-100 mb-3"
                    href="{% url 'chat-with' profile_user.username %}">

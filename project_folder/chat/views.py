@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages # Added
-from django.contrib.auth.models import User # Added
+from django.contrib import messages
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.http import Http404 # Replaced HttpResponse with Http404
+from django.http import Http404
 from django.utils import timezone
 
-from .utils import get_or_create_chatroom_for_users # Added
+from .utils import get_or_create_chatroom_for_users
 from .forms import MessageForm
 from .models import Room
 
@@ -15,13 +15,13 @@ from .models import Room
 # Create your views here.
 
 @login_required
-def roomView(request, room_name='public'): #added room_name
+def roomView(request, room_name='public'):
 
-    room = get_object_or_404(Room, name=room_name) #set name to room_name
+    room = get_object_or_404(Room, name=room_name)
     form = MessageForm()
-    # Added this below script to get other_user
     other_user = None
 
+    # GET other_user IF room is private
 
     if room.is_private:
         members = room.members.all()

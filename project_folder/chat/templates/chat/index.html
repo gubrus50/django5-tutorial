@@ -6,15 +6,9 @@
 
 {% block content %}
 
-<!-- Added below dropdown -->
+
 {% include 'chat/includes/my_chats.html' with div_class="float-end" %}
 
-
-{% comment %}
-<!-- This below script has been updated
-Included if statement to add other_user
-Moved 1 <hr> near #online-status TO outside the if statement -->
-{% endcomment %}
 {% if other_user %}
     <a class="float-start" href="{% url 'profile' other_user.id %}">
         <img width="75px" class="rounded-circle bg-light me-2" src="{{ other_user.profile.image.url }}">

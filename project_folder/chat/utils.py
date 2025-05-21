@@ -3,9 +3,11 @@ from .models import Room
 
 
 def get_or_create_chatroom_for_users(User_A, User_B):
-    """This utility searches for an existing private chatroom between
+    """
+    This utility searches for an existing private chatroom between
     the provided user instances. If chatroom is not found,
-    then a new private chatroom is created for those users."""
+    then a new private chatroom is created for those users.
+    """
 
     if User_A == User_B:
         print('Cannot create chatroom for the same user!')

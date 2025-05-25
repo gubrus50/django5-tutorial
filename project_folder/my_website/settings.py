@@ -28,20 +28,23 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost'] # added localhost, remove this.
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Top priority apps
     'daphne',
+    'whitenoise.runserver_nostatic',
+    # Build-in apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Add libraries above apps
+    # Libraries
     'django_htmx',
     'storages',
     'crispy_forms',
@@ -50,7 +53,7 @@ INSTALLED_APPS = [
     'django_sass',
     'django_resized',
     'django_recaptcha',
-    # Add apps below
+    # Django apps
     'app_name.apps.AppNameConfig',
     'users.apps.UsersConfig',
     'chat.apps.ChatConfig',
@@ -58,6 +61,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
@@ -216,12 +220,13 @@ STORAGES = {
         },
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         "OPTIONS": {
             "location": STATIC_ROOT,
         },
     },
 }
+
 
 # DeepAI for NSFW image detection
 

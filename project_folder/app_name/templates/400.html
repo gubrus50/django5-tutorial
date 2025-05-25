@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>400 - Error</title>
+    <link rel="stylesheet" href="{% static 'app_name/css/error.css' %}">
+</head>
+<body>
+    <main>
+        <label class="hidden" style="--delay: 6.4s">ERROR</label>
+        <h1 class="hidden" style="--delay: 1s"><span style="--delay: 0.5s">4</span><span style="--delay: 1s">0</span><span style="--delay: 1.5s">0</span></h1>
+        <h2 class="hidden" style="--delay: 4s">Bad Request</h2>
+        <p class="hidden" style="--delay: 6.2s">Oops! Something went wrong with your request:</p>
+        <br>
+        <p class="hidden" style="--delay: 6.3s">{{ request.path }}</p>
+    </main>
+</body>
+</html>

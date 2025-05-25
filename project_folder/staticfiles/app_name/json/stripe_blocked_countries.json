@@ -1,0 +1,34 @@
+[
+    {
+        "abbrev": "CU",
+        "name": "Cuba"
+    },
+    {
+        "abbrev": "IR",
+        "name": "Iran"
+    },
+    {
+        "abbrev": "KP",
+        "name": "North Korea"
+    },
+    {
+        "abbrev": "RU",
+        "name": "Russian Federation"
+    },
+    {
+        "abbrev": "SY",
+        "name": "Syria"
+    },
+    {
+        "abbrev": "UA-CR",
+        "name": "Crimea"
+    },
+    {
+        "abbrev": "UA-DN",
+        "name": "Donetsk"
+    },
+    {
+        "abbrev": "UA-LU",
+        "name": "Luhansk"
+    }
+]

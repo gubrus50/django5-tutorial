@@ -198,7 +198,8 @@ class DonateForm(forms.Form):
             'id': 'Field-stateInput',
         }),
         required=True
-    )"""
+    )
+    """
 
     class Meta:
         # Disclude the '*' suffix from the fields

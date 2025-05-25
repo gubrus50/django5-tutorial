@@ -3,72 +3,11 @@ from django.contrib.auth.models import User
 from django_resized import ResizedImageField
 from django.conf import settings
 
-from .utils import get_or_create_stripe_customer
-
-from botocore.exceptions import ClientError
-import boto3
-
-
-
-s3 = boto3.client(
-    's3',
-    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    region_name=settings.AWS_S3_REGION_NAME
+from .utils import (
+    remove_profile_pic,
+    recycle_profile_pic,
+    get_or_create_stripe_customer,
 )
-
-
-def is_profile_pic(image_key):
-    try:
-        s3.head_object(
-            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-            Key=f"profile_pics/{image_key.split('/')[-1]}"
-        )
-        return True
-
-    except ClientError as e:
-        if e.response['Error']['Code'] == '404':
-            return False
-        else:
-            raise e
-
-
-def remove_profile_pic(image_key):
-    if is_profile_pic(image_key):
-        # Delete the old image from the original location
-        s3.delete_object(
-            Key=f"profile_pics/{image_key.split('/')[-1]}",
-            Bucket=settings.AWS_STORAGE_BUCKET_NAME
-        )
-
-
-def recycle_profile_pic(image_key):
-
-    if is_profile_pic(image_key):
-
-        profile_pic_key = f"profile_pics/{image_key.split('/')[-1]}"
-        recycle_pic_key = f"recycle_pics/{image_key.split('/')[-1]}"
-
-        # Copy the image to the recycle_pics folder
-        s3.copy_object(
-            Key=recycle_pic_key,
-            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-            CopySource={
-                'Key': profile_pic_key,
-                'Bucket': settings.AWS_STORAGE_BUCKET_NAME
-            }
-        )
-        # Delete the image from the original location
-        s3.delete_object(
-            Key=profile_pic_key,
-            Bucket=settings.AWS_STORAGE_BUCKET_NAME
-        )
-
-    else:
-        message =  f'Image {image_key} not found in bucket: '
-        message += f'{settings.AWS_STORAGE_BUCKET_NAME}'
-        message += ', skipping copy and delete.'
-        print(message)
 
 
 
@@ -92,10 +31,6 @@ class Profile(models.Model):
         try:
             this = Profile.objects.get(user=self.user)
 
-            # Create Stripe customer for new Profile. (Stripe is used for making payments)
-            if not hasattr(this, 'stripe_customer_id'):
-                self.stripe_customer_id = get_or_create_stripe_customer(self.user)
-
             # Only move the old image if there is an existing image and it's different from the new image
             if this.image and this.image.name != self.image.name:
                 #recycle_profile_pic(this.image.name)
@@ -108,3 +43,38 @@ class Profile(models.Model):
 
         super().save(*args, **kwargs)
         
+
+
+
+class Account(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    # State
+    is_active = models.BooleanField(default=True)
+    is_suspended = models.BooleanField(default=False)
+    suspension_end = models.DateTimeField(blank=True, null=True)
+
+    # Security
+    has_verified_email = models.BooleanField(default=False)
+    mfa_secret = models.CharField(max_length=16, blank=True, null=True)
+    mfa_enabled = models.BooleanField(default=False)
+    #backup_codes = ""
+
+    # Payment
+    stripe_customer_id = models.CharField(max_length=255, blank=True, null=True, unique=True, editable=False)
+    stripe_last_intent_id = models.CharField(max_length=255, blank=True, null=True, unique=True, editable=False)
+
+
+    def save(self, *args, **kwargs):
+        try:
+            account_instance = Account.objects.get(user=self.user)
+
+            # Create Stripe customer for new Account. (Stripe is used for making payments)
+            if not hasattr(account_instance, 'stripe_customer_id'):
+                self.stripe_customer_id = get_or_create_stripe_customer(self.user)
+
+        except Account.DoesNotExist:
+            pass
+
+
+        super().save(*args, **kwargs)

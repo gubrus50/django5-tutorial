@@ -358,8 +358,8 @@ def donateView(request):
         description=f'Donation',
     )
 
-    request.user.profile.stripe_last_intent_id = intent.id
-    request.user.profile.save()
+    request.user.account.stripe_last_intent_id = intent.id
+    request.user.account.save()
 
     context.update({
         'client_secret': intent.client_secret
@@ -385,7 +385,7 @@ def donateUpdatePaymentIntentView(request):
 
     # Note: amount is in groszy (PLN)
     intent = stripe.PaymentIntent.modify(
-        id=request.user.profile.stripe_last_intent_id,
+        id=request.user.account.stripe_last_intent_id,
         amount=int(donation * 100),
         metadata={'donation': str(donation)}
     )
@@ -446,66 +446,3 @@ def buyPlanPaymentIntentView(request):
 
 def paymentSuccessView(request):
     return render(request, 'app_name/payment_success.html')
-
-
-
-"""
-@login_required
-def paymentFormView(request):
-
-    try:
-        intent = stripe.PaymentIntent.create(
-            amount=1000, # In pennies hence amount=500 → £5.00
-            currency="pln",
-            #automatic_payment_methods={"enabled": True},
-            payment_method_types=[
-                # additional payment methods:
-                #   apple_pay, google_pay, amazon_pay ...
-                # NOTE: Apple Pay, Google Pay, Link, PayPal, and Amazon Pay require domains to be added
-                'card',
-                'paypal',
-                #'revolut_pay',
-                'p24',
-                #'klarna'
-            ],
-        )
-    except stripe.error.StripeError as e:
-        messages.error(request, f'Failed to create payment intent: {e}')
-        return redirect('index')
-
-    # payment_method_types:    https://docs.stripe.com/payments/paypal
-    # payment method settings: https://dashboard.stripe.com/test/settings/payment_methods/pmc_1QxSfaCMc3sguBOiAOlb0yd5
-    # payment dashboard:       https://dashboard.stripe.com/account/payments/settings
-
-    if request.method == 'POST':
-
-        #customer = stripe.Customer.create(
-        #    email=request.user.email,
-        #    name=request.user.username,
-        #    address={
-        #        country=request.POST.get('country'),
-        #        postal_code=request.POST.get('postalCode')
-        #    }
-        #    source=request.POST.get('stripeToken')
-        #)
-        #charge = stripe.Charge.create(
-        #    customer,
-        #    amount=int(amount * 100), # amount=500 → $5.00
-        #    currency=intent.currency,
-        #    description='My description'
-        #)
-
-        messages.success(request, 'Payment successful!')
-        return redirect('success', args=option)
-
-
-    context = {
-        'display_price': intent.amount / 100, # Convert pennies to pounds
-        'client_secret': intent.client_secret,
-        'stripe_public': settings.STRIPE_PUBLIC_KEY
-    }
-
-    return render(request, 'app_name/payment.html', context)
-
-
-"""

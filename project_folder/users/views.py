@@ -83,7 +83,7 @@ def profileView(request, user_id):
                 form_user.save()
                 form_profile.save()
                 stripe.Customer.modify(
-                    user_instance.profile.stripe_customer_id,
+                    user_instance.account.stripe_customer_id,
                     name=user_instance.username,
                     email=user_instance.email
                 )

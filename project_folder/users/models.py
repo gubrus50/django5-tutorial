@@ -14,9 +14,6 @@ from .utils import (
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    stripe_customer_id = models.CharField(max_length=255, blank=True, null=True, unique=True, editable=False)
-    stripe_last_intent_id = models.CharField(max_length=255, blank=True, null=True, unique=True, editable=False)
-
     phone_number = models.CharField(max_length=15)
     image = ResizedImageField(
         size=[300, 300],

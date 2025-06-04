@@ -16,14 +16,7 @@ from dotenv import load_dotenv # Remove this code in production
 load_dotenv()                  # Remove this code in production
 
 
-COMPANY_NAME = os.getenv('COMPANY_NAME')
-
-if not COMPANY_NAME:
-    raise ValueError('COMPANY_NAME is not set')
-
-COMPANY_NAME = str(COMPANY_NAME)
-
-
+COMPANY_NAME = str(os.environ['COMPANY_NAME'])
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

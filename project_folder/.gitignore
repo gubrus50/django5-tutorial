@@ -8,6 +8,8 @@ ENV/
 env.bak/
 venv.bak/
 
+!.env_template
+
 # Node.js
 node_modules/
 

@@ -1,0 +1,32 @@
+{% load custom_filters %}
+<div class="modal fade" id="{{ step|replace:'_|-' }}-modal" tabindex="-1" data-bs-backdrop="static" aria-labelledby="{{ step|replace:'_|-' }}-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="{{ step|replace:'_|-' }}-label">{{ title }}</h5>
+                <span class="mx-auto text-secondary">{{ page }}</span>
+                <button type="button" class="btn-close" onclick="onAnyClosedModal()" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% block body %}{% endblock %}
+            </div>
+            <form id="{{ step|replace:'_|-' }}-form" class="modal-footer"
+              hx-post="{{ post_url }}"
+              hx-trigger="submit throttle:200ms"
+              hx-swap="none">
+                {% csrf_token %}
+                <div class="input-group mb-3">
+                    {% block input %}{% endblock %}
+                    <input name="step" type="hidden" value="{{ step }}">
+                </div>
+                <button type="submit" class="btn btn-primary modal-submit-button w-100"
+                  hx-post="{{ post_url }}"
+                  hx-trigger="click delay:1000ms"
+                  hx-swap="none">
+                    <span class="spinner-grow spinner-grow-sm visually-hidden" role="status" aria-hidden="true"></span>
+                    <span class="button-text">{{ submit }} <strong class="ms-1">{{ submit_boldend }}</strong></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

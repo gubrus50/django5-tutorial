@@ -9,12 +9,15 @@ from .utils import (
     get_or_create_stripe_customer,
 )
 
+from phonenumber_field.modelfields import PhoneNumberField
+import pyotp
+
 
 
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=15)
+
     image = ResizedImageField(
         size=[300, 300],
         crop=['middle', 'center'],
@@ -45,6 +48,9 @@ class Profile(models.Model):
 
 class Account(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    # Contact
+    phone_number = PhoneNumberField(unique=True, null=True)
     
     # State
     is_active = models.BooleanField(default=True)
@@ -53,7 +59,7 @@ class Account(models.Model):
 
     # Security
     has_verified_email = models.BooleanField(default=False)
-    mfa_secret = models.CharField(max_length=16, blank=True, null=True)
+    mfa_secret = models.CharField(max_length=32, blank=True, null=True)
     mfa_enabled = models.BooleanField(default=False)
     #backup_codes = ""
 
@@ -69,6 +75,9 @@ class Account(models.Model):
             # Create Stripe customer for new Account. (Stripe is used for making payments)
             if not hasattr(account_instance, 'stripe_customer_id'):
                 self.stripe_customer_id = get_or_create_stripe_customer(self.user)
+            # Create MFA Secret for new Account. (MFA secret is used for generating One-Time password)
+            if not hasattr(account_instance, 'mfa_secret'):
+                self.mfa_secret = pyotp.random_base32()
 
         except Account.DoesNotExist:
             pass

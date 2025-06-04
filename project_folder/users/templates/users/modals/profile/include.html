@@ -1,0 +1,50 @@
+<section id="modals" hx-swap-oob="innerHTML">
+    {% with model_path='users/modals/profile/'|add:step|add:".html" %}
+        {% include model_path with title=title post_url=post_url step=step page=page submit=submit submit_boldend=submit_boldend %}
+    {% endwith %}
+    <script type="text/javascript">
+        // Global access to currently loaded modal element
+        var modal = new bootstrap.Modal(document.currentScript.parentElement.querySelector('.modal'));
+
+        (() => {
+
+            // https://getbootstrap.com/docs/5.0/components/modal/#methods
+            // Destroy modal when it is fully closed
+            modal._element.addEventListener('hidden.bs.modal', () => {
+                modal._element.remove();
+                modal.dispose(); // Removes Bootstrap modal_instance
+            });
+
+            // Remove inputs error-highlights ON input change AND modal exit
+            let input = modal._element.querySelector('input:not([type="hidden"])');
+                input.addEventListener('keydown', () =>
+            {
+                setNormalInput(input);
+            });
+            let btnClose = modal._element.querySelector('.btn-close');
+                btnClose.addEventListener('click', () =>
+            {
+                setNormalInput(input);
+            });
+
+            // Set loading animation for button, when pressed 
+            let btnSubmit = document.querySelector('.modal-submit-button')
+                btnSubmit.dataset.name = btnSubmit.innerHTML.trim();
+                btnSubmit.addEventListener('click', () =>
+            {
+                setLoadingButtonForModal(btnSubmit);
+            });
+            
+            // Remove faded background element: .modal-backgrop
+            //
+            // Note: Bootstrap Models remove .modal-backgrop by themselves on modal_instance.hide() call.
+            // However, the Bootstrap Modal is replaced too quickly for its eventListener to clear the faded element.
+            //
+            document.querySelectorAll('.modal-backdrop')?.forEach(backdrop => backdrop.remove());
+
+            modal.show();
+            document.currentScript.remove();
+
+        })();
+    </script>
+</section>

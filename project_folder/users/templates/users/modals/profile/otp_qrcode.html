@@ -1,0 +1,44 @@
+{% extends 'users/modals/profile/base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+{% block body %}
+    {% if qrcode_data_uri %}
+    <div id="{{ step|replace:'_|-' }}-instructions">
+        <p>Download <a href="#">authenticator app</a> on your mobile device, and use it to</p>
+        <h5><strong>Scan the QR code</strong></h5>
+        <p>To receive the one-time password (OTP) required to activate <strong>Multi-Factor Authentication</strong></p>
+        <hr>
+        <h5><strong>Enter code</strong></h5>
+        <span id="mfa-secret" class="text-primary" style="letter-spacing: 0.15em; word-spacing: 0.3em;"></span>
+        <script type="text/javascript">
+            (() => {
+                // Wrapped with self-invoking function for security reasons:
+                // mfa_secret code must not be easily available to prevent fraud
+                //
+                // "DMSKAJIWESKJ"... -> "DMSK AJIW ESKJ" 
+                let splitText = text => text.match(/.{1,4}/g).join(' ');
+                let mfaSecret = document.getElementById('mfa-secret');
+
+                mfaSecret.innerText = splitText('{{ request.user.account.mfa_secret }}');
+                mfaSecret = undefined;
+
+                document.currentScript.remove();
+            })();
+        </script>
+        <p>Into your authentication app if you're unable to scan the QR code</p>
+    </div>
+    {% endif %}
+    <div class="d-flex justify-content-between">
+        <img class="w-75 border rounded-2" style="max-width: 300px;" src="{{ qrcode_data_uri }}" alt="Failed to load - QR Code">
+        <img class="w-auto" style="max-width: 150px;" src="{% static 'users/img/authenticator_apps.png' %}">
+    </div>
+{% endblock %}
+
+{% block input %}
+    <span class="input-group-text">OTP</span>
+    <input name="otp_code" type="text" class="form-control" aria-label="one-time-password" aria-describedby="{{ step|replace:'_|-' }}-instructions" required
+        hx-post="{{ post_url }}"
+        hx-trigger="input changed delay:250ms"
+        hx-swap="none">
+{% endblock %}

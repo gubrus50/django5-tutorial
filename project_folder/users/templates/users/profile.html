@@ -1,10 +1,10 @@
 {% extends 'app_name/base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
-
 {% block title %}Profile Page{% endblock %}
-
 {% block content %}
+
+<section id="modals"></section>
 
 <div class="container">
     <div class="row">
@@ -28,6 +28,17 @@
                     <form action="{% url 'profile' profile_user.id %}" enctype="multipart/form-data" method="POST">
                         {% csrf_token %} 
                         {{ forms.profile|crispy }}
+                        {{ forms.account|crispy }}
+                        <hr>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="mfa-flex-switch"
+                              {% if user.account.mfa_enabled %}checked{% endif %}
+                              hx-post="{% url 'enable_mfa' %}"
+                              hx-trigger="click throttle:1s"
+                              hx-swap="none">
+                            <label class="form-check-label" for="mfa-flex-switch" title="Multi Factor Authentication">Enable MFA</label>
+                        </div>
+                        <hr>
                         {{ forms.user|crispy }}
                         <div class="row justify-content-between">
                             <div class="col-auto">
@@ -40,6 +51,7 @@
                     </form>
 
                 {% else %}
+
                     {% for field in forms.user %}
                         {% if field.label|lower != "confirm password" %}
                         <div class="mb-3">
@@ -66,3 +78,78 @@
 {% endblock %}
 
 
+{% block base %}
+<script name="functions-for-included-modal" type="text/javascript">
+
+const modals = document.getElementById('modals');
+
+function hideModals() {
+    document.querySelectorAll('.modal').forEach(modal => {
+        const Modal = bootstrap.Modal.getOrCreateInstance(modal);
+              Modal.hide();
+    });
+}
+function setInvalidInput(input) {
+    input.classList.add('is-invalid');
+    input.classList.add('text-danger');
+}
+function setNormalInput(input) {
+    input.classList.remove('is-invalid');
+    input.classList.remove('text-danger');
+}
+function setLoadingButtonForModal(button) {
+    button.querySelector('.spinner-grow').classList.remove('visually-hidden');
+    button.querySelector('.button-text').innerText = 'loading...';
+}
+function setNormalButtonForModal(button) {
+    button.querySelector('.spinner-grow').classList.add('visually-hidden');
+    button.querySelector('.button-text').innerHTML = button.dataset.name;
+}
+
+</script>
+<script name="main-script" type="text/javascript">
+
+const input_enable_mfa = document.getElementById('mfa-flex-switch');
+const onAnyClosedModal = () => input_enable_mfa.checked = false;
+
+document.addEventListener('htmx:afterRequest', async (event) => {
+
+    let form = event.detail.target.closest('form');
+    if (!form?.classList.contains('modal-footer')) return;
+
+
+    // Receive response from the backend
+
+    let xhr = event.detail.xhr;
+        responseText = await xhr.responseText,
+        response = '';
+
+    if (xhr.getResponseHeader('Content-Type')?.includes('application/json')) {
+        response = JSON.parse(responseText);
+    }
+    else return;
+
+
+    // Handle response
+
+    if (response.error) {
+        console.error(response.error);
+    }
+    if (response.success) {
+        hideModals();
+    }
+    else if (response.error === 'Invalid OTP' || 'Invalid password') {
+        let input = form.querySelector('input:not([type="hidden"])');
+        setInvalidInput(input);
+    }
+
+
+    // Reset modal's submit button
+
+    let button_submit = form.querySelector('.modal-submit-button');
+    setNormalButtonForModal(button_submit);
+
+});
+
+</script>
+{% endblock %}

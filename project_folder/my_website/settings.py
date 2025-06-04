@@ -16,6 +16,15 @@ from dotenv import load_dotenv # Remove this code in production
 load_dotenv()                  # Remove this code in production
 
 
+COMPANY_NAME = os.getenv('COMPANY_NAME')
+
+if not COMPANY_NAME:
+    raise ValueError('COMPANY_NAME is not set')
+
+COMPANY_NAME = str(COMPANY_NAME)
+
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -28,7 +37,13 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1']
 
-ALLOWED_HOSTS = ['localhost'] # added localhost, remove this.
+ALLOWED_HOSTS = []
+
+# pip install django-cors-headers
+# If you would like to restrict the foreign requests.
+# You'd need to include a new middleware: corsheaders.middleware.CorsMiddleware
+# Specify your allowed origin below: "localhost", "https://my-domain.com"
+ALLOWED_ORIGINS = {}
 
 
 # Application definition
@@ -47,6 +62,7 @@ INSTALLED_APPS = [
     # Libraries
     'django_htmx',
     'storages',
+    'phonenumber_field', # added (pip install django-phonenumber-field[phonenumberslite])
     'crispy_forms',
     'crispy_bootstrap5',
     'django_bootstrap5',
@@ -170,6 +186,7 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -192,10 +209,24 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = f'(Domain) <{EMAIL_HOST_USER}>'
 
+
+# Django Phonenumber Field 
+
+# -- WARNING! -- Data loss may occur when changing the DB format!
+#
+# Hence, it is critical to read the below documentation before making any changes.
+# https://django-phonenumber-field.readthedocs.io/en/latest/reference.html#phone-number-format-choices
+
+PHONENUMBER_DB_FORMAT='E164'
+PHONENUMBER_DEFAULT_FORMAT='E164'
+PHONENUMBER_DEFAULT_REGION='GB' # None is default
+
+
 # Google reCAPTCHA
 
 RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
+
 
 # AWS S3 Bucket CONFIG
 
@@ -239,3 +270,18 @@ DETECT_NSFW_IMAGES = os.getenv('DETECT_NSFW_IMAGES', 'False').lower() in ['true'
 
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_TEST_KEY') if DEBUG else os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_TEST_KEY') if DEBUG else os.getenv('STRIPE_SECRET_KEY')
+
+
+# One-Time Password for Multi-Factor Authentication
+
+OTP_ISSUER_NAME = COMPANY_NAME
+OTP_DEFAULT_INTERVAL = 30 # 30 seconds
+OTP_EMAIL_INTERVAL = 180 # 3 minutes
+OTP_SMS_INTERVAL = 180 # 3 minutes
+
+
+# Twilio API keys
+
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')

@@ -25,13 +25,11 @@
 
     
     <form action="{% url 'index' %}" enctype="multipart/form-data" method="POST"
-
         hx-post="{% url 'index' %}"
         hx-target="#models"
         hx-trigger="keyup delay:500ms"
         hx-swap="innerHTML"
-        hx-include="[name='search_query'], [name='creator_value'], [name='country_code_value']"
-    >
+        hx-include="[name='search_query'], [name='creator_value'], [name='country_code_value']">
         {% csrf_token %}
         <div class="input-group py-3">
             <input type="search" name="search_query" class="form-control rounded-start" placeholder="Search">

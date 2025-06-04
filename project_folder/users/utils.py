@@ -1,7 +1,9 @@
 from django.core.files.uploadedfile import UploadedFile
+from django.core.mail import send_mail
 from django.conf import settings
+from twilio.rest import Client
 
-import requests, stripe, boto3
+import io, base64, requests, stripe, boto3, pyotp, qrcode
 from botocore.exceptions import ClientError
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -107,7 +109,8 @@ def is_image_nsfw(image_file: UploadedFile):
 
 
 def get_or_create_stripe_customer(user):
-    """Retrieves or creates a Stripe customer ID for the given user.
+    """
+    Retrieves or creates a Stripe customer ID for the given user.
     
     Args:
         user: Django auth User instance
@@ -143,3 +146,153 @@ def get_or_create_stripe_customer(user):
             user.account.save()
 
     return stripe_customer_id
+
+
+
+
+def get_or_create_mfa_secret_for_user(user_instance):
+    """
+    Generates a random base32 string and saves it as mfa_secret
+    in the, attached to the auth user_instance, account model.
+
+    Returns: 'mfa_secret' from user_instance.account model (on success),
+             'False' otherwise.
+    """
+
+    if hasattr(user_instance, 'account'):
+        if not user_instance.account.mfa_secret:
+            user_instance.account.mfa_secret = pyotp.random_base32()
+            user_instance.account.save()
+
+    return user_instance.account.mfa_secret or False
+
+
+
+
+def get_users_mfa_secret_as_qrcode_base64(user_instance):
+    """
+    Generates a Base64-encoded QR code from an MFA secret.
+
+    This function:
+    - This function ensure the user has a stored MFA secret.
+    - Converts the MFA secret into an OTP provisioning URI.
+    - Generates a QR code from the OTP URI.
+    - Stores the QR code in an in-memory buffer as a PNG.
+    - Encodes the QR code image into a Base64 data URI format.
+    
+    Args:
+        user_instance: A Django User instance.
+
+    Returns:
+        str: A Base64-encoded PNG data URI suitable for embedding in HTML.
+    """
+
+    mfa_secret = get_or_create_mfa_secret_for_user(user_instance)
+
+    otp_uri = pyotp.totp.TOTP(mfa_secret).provisioning_uri(
+        name=user_instance.email,
+        issuer_name=settings.OTP_ISSUER_NAME
+    )
+
+    # Convert OTP URI to QR Code as PNG
+    qr = qrcode.make(otp_uri)     # Convert OTP URI -> QR Code 
+    buffer = io.BytesIO()         # Set in-memory buffer to temporarily store the QR Code
+    qr.save(buffer, format='PNG') # Convert QR Code -> PNG image & store it in the buffer 
+    buffer.seek(0)                # Move buffer's reading position to the beginning
+
+    # Return QR image AS data base64 URI
+    qrcode_png_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    return f'data:image/png;base64,{qrcode_png_base64}'
+
+
+
+
+def generate_otp_for_user(user_instance, interval=settings.OTP_DEFAULT_INTERVAL):
+    """
+    Generates a time-based one-time password (OTP) using the user's MFA secret
+
+    This function ensure the user has a stored MFA secret, generates an OTP using TOTP (based on interval)
+
+    Args:
+        user_instance: A Django User instance.
+        interval: Natural number (in seconds).
+
+    Returns:
+        str: The generated OTP
+    """
+
+    mfa_secret = get_or_create_mfa_secret_for_user(user_instance)
+
+    totp = pyotp.TOTP(mfa_secret, interval=interval)
+    otp = totp.now()
+
+    return otp
+
+
+
+
+def email_otp_to_user(user_instance):
+    """
+    Generates a time-based one-time password (OTP) using the user's MFA secret and sends it via email.
+
+    This function ensures the user has a stored MFA secret, generates an OTP using TOTP (based on OTP_EMAIL_INTERVAL),
+    and delivers it to their registered email address.
+
+    Args:
+        user_instance: A Django User instance.
+
+    Returns:
+        str: The generated OTP (on success).
+        bool: False (on missing otp).
+    """
+
+    interval = settings.OTP_EMAIL_INTERVAL
+
+    otp = generate_otp_for_user(user_instance, interval=interval)
+    if not otp:
+        return False
+
+    # Send OTP via email
+    sender_email = settings.EMAIL_HOST_USER
+    subject = 'Your OTP Code'
+    message = f'Your OTP code is {otp}. It expires in {interval} seconds.\n\nPlease do not share this code with anyone!'
+    send_mail(subject, message, sender_email, [user_instance.email])
+
+    return otp
+
+
+
+
+def sms_otp_to_user(user_instance):
+    """
+    Generates a time-based one-time password (OTP) using the user's MFA secret and sends it via SMS.
+
+    This function ensures the user has a stored MFA secret, generates an OTP using TOTP (based on OTP_SMS_INTERVAL),
+    and delivers it to their registered in account model - phone number (which should be in E.164 format)
+
+    Args:
+        user_instance: A Django User instance linked to an account with MFA enabled.
+
+    Returns:
+        str: The generated OTP (on success).
+        bool: False (on missing otp).
+    """
+
+    interval=settings.OTP_SMS_INTERVAL
+
+    otp = generate_otp_for_user(user_instance, interval=interval)
+    if not otp:
+        return False
+
+    account_sid = settings.TWILIO_ACCOUNT_SID
+    auth_token = settings.TWILIO_AUTH_TOKEN
+    client = Client(account_sid, auth_token)
+
+    # Both 'from_' and 'to' phone numbers must be of format: E.164
+    message = client.messages.create(
+        body=f'Your OTP code is {otp}. It expires in {interval} seconds.\n\nPlease do not share this code with anyone!',
+        from_=str(settings.TWILIO_PHONE_NUMBER), # Must support SMS
+        to=str(user_instance.account.phone_number)
+    )
+
+    return otp

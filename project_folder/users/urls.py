@@ -6,6 +6,8 @@ urlpatterns = [
     path('login', auth_views.LoginView.as_view(template_name='users/form.html'), name='login'),
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('register', views.registerUserView, name='register'),
+    path('enable-mfa', views.enableMFAView, name='enable_mfa'),
+    path('request-otp/<str:method>', views.requestOTPView, name='request_otp'),
     path('profile/<int:user_id>', views.profileView, name='profile'),
 
     path('password-reset/',

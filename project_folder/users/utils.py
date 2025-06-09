@@ -271,7 +271,7 @@ def sms_otp_to_user(user_instance):
     and delivers it to their registered in account model - phone number (which should be in E.164 format)
 
     Args:
-        user_instance: A Django User instance linked to an account with MFA enabled.
+        user_instance: A Django User instance.
 
     Returns:
         str: The generated OTP (on success).
@@ -291,7 +291,8 @@ def sms_otp_to_user(user_instance):
     # Both 'from_' and 'to' phone numbers must be of format: E.164
     message = client.messages.create(
         body=f'Your OTP code is {otp}. It expires in {interval} seconds.\n\nPlease do not share this code with anyone!',
-        from_=str(settings.TWILIO_PHONE_NUMBER), # Must support SMS
+        # Twilio Phone Number must support SMS (Test numbers cannot send SMS)
+        from_=str(settings.TWILIO_PHONE_NUMBER),
         to=str(user_instance.account.phone_number)
     )
 

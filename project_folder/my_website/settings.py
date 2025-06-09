@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     # Libraries
     'django_htmx',
     'storages',
-    'phonenumber_field', # added (pip install django-phonenumber-field[phonenumberslite])
+    'phonenumber_field',
     'crispy_forms',
     'crispy_bootstrap5',
     'django_bootstrap5',
@@ -210,9 +210,9 @@ DEFAULT_FROM_EMAIL = f'(Domain) <{EMAIL_HOST_USER}>'
 # Hence, it is critical to read the below documentation before making any changes.
 # https://django-phonenumber-field.readthedocs.io/en/latest/reference.html#phone-number-format-choices
 
-PHONENUMBER_DB_FORMAT='E164'
-PHONENUMBER_DEFAULT_FORMAT='E164'
-PHONENUMBER_DEFAULT_REGION='GB' # None is default
+PHONENUMBER_DB_FORMAT='E164'      # 'E164' by default when unspecified
+PHONENUMBER_DEFAULT_FORMAT='E164' # 'E164' by default when unspecified
+PHONENUMBER_DEFAULT_REGION='GB'   # 'None' by default when unspecified
 
 
 # Google reCAPTCHA

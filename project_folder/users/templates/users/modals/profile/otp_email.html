@@ -31,7 +31,7 @@
                     timeout = null,
                     fallback = null,
                     interval = null,
-                    isIntervalActive = false;
+                    isIntervalActive = false,
                     count = 0;
                 
 
@@ -86,7 +86,7 @@
                     }
                     else return;
 
-                    // Cancel the timeout & fallback execution if response if received
+                    // Cancel the timeout & fallback execution if response is received
                     clearTimeout(timeout);
                     clearTimeout(fallback);
 

@@ -37,6 +37,7 @@ def enableMFAView(request):
         return JsonResponse({'error': 'MFA already enabled'}, status=400)
 
     # Configuration
+    # Note: changing STEPS order affects modals-display-sequence
     STEPS = ['password', 'otp_qrcode', 'otp_email', 'otp_sms']
     TITLE = 'Enable MFA'
     POST_URL = reverse('enable_mfa')

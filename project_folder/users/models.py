@@ -68,19 +68,15 @@ class Account(models.Model):
     stripe_last_intent_id = models.CharField(max_length=255, blank=True, null=True, unique=True, editable=False)
 
 
-    def save(self, *args, **kwargs):
-        try:
-            account_instance = Account.objects.get(user=self.user)
+    def initialize(self, *args, **kwargs):
 
-            # Create Stripe customer for new Account. (Stripe is used for making payments)
-            if not hasattr(account_instance, 'stripe_customer_id'):
-                self.stripe_customer_id = get_or_create_stripe_customer(self.user)
-            # Create MFA Secret for new Account. (MFA secret is used for generating One-Time password)
-            if not hasattr(account_instance, 'mfa_secret'):
-                self.mfa_secret = pyotp.random_base32()
+        # Create Stripe customer for new Account. (Stripe is used for making payments)
+        if not self.stripe_customer_id:
+            self.stripe_customer_id = get_or_create_stripe_customer(self.user)
 
-        except Account.DoesNotExist:
-            pass
+        # Create MFA Secret for new Account. (MFA secret is used for generating One-Time password)
+        if not self.mfa_secret:
+            self.mfa_secret = pyotp.random_base32()
 
 
         super().save(*args, **kwargs)

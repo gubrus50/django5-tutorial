@@ -8,7 +8,7 @@ from django.conf import settings
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.urls import reverse
 
-from .models import Profile
+from .models import Profile, Account
 from .forms import (
     UserRegisterForm,
     UserUpdateForm,
@@ -38,8 +38,6 @@ def enableMFAView(request):
 
     if request.user.account.mfa_enabled and switch:
         return JsonResponse({'error': 'MFA already enabled'}, status=400)
-    if not request.user.account.mfa_enabled and not switch:
-        return JsonResponse({'info': 'No action required'}, status=200)
 
 
     # Configuration
@@ -215,6 +213,9 @@ def registerUserView(request):
             profile = form_profile.save(commit=False)
             profile.user = user
             profile.save()
+            # Create Account model for new user
+            account = Account.objects.create(user=user)
+            account.initialize()
 
             # Authenticate the user
             raw_password = form_user.cleaned_data.get('password1')
@@ -240,7 +241,7 @@ def registerUserView(request):
         'registry': True,
         'register_view_forms': {
             'user': form_user, 
-            'profile': form_profile
+            'profile': form_profile,
         }
     }
 

@@ -5,7 +5,7 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="{{ step|replace:'_|-' }}-label">{{ title }}</h5>
                 <span class="mx-auto text-secondary">{{ page }}</span>
-                <button type="button" class="btn-close" onclick="onAnyClosedModal()" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" onclick="onAnyClosedModal('{{ submit }}')" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 {% block body %}{% endblock %}
@@ -19,7 +19,7 @@
                     {% block input %}{% endblock %}
                     <input name="step" type="hidden" value="{{ step }}">
                 </div>
-                <button type="submit" class="btn btn-primary modal-submit-button w-100"
+                <button type="submit" class="btn btn-{% if submit == 'Disable' %}danger{% else %}primary{% endif %} modal-submit-button w-100"
                   hx-post="{{ post_url }}"
                   hx-trigger="click delay:1000ms"
                   hx-swap="none">

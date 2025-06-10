@@ -33,8 +33,14 @@ def enableMFAView(request):
     if request.method != 'POST':
         return HttpResponseBadRequest()
 
-    if request.user.account.mfa_enabled:
+    step = request.POST.get('step')
+    switch = request.POST.get('switch')
+
+    if request.user.account.mfa_enabled and switch:
         return JsonResponse({'error': 'MFA already enabled'}, status=400)
+    if not request.user.account.mfa_enabled and not switch:
+        return JsonResponse({'info': 'No action required'}, status=200)
+
 
     # Configuration
     # Note: changing STEPS order affects modals-display-sequence
@@ -46,8 +52,31 @@ def enableMFAView(request):
         'post_url': POST_URL,
     }
 
-    # Show initial modal
-    step = request.POST.get('step')
+
+    # --- Prompt logged-in user TO Disable MFA ---
+    
+    if request.user.account.mfa_enabled and not switch:
+
+        if step == 'password':
+            # Validate password
+            if not _validate_step(request, step):
+                return JsonResponse({'error': _get_validation_error(step), 'step': step}, status=400)
+            else:
+                request.user.account.mfa_enabled = False
+                request.user.account.save()
+                return JsonResponse({'success': 'Disabled MFA'}, status=200)
+
+        _reset_all_steps(request, STEPS)
+        return render(request, 'users/modals/profile/include.html', {
+            'title': 'Disable MFA',
+            'post_url': reverse('enable_mfa'),
+            'step': 'password',
+            'submit': 'Disable',
+            'submit_boldend': 'Multi-Factor Authentication',
+        })
+
+    # --- Show initial modal TO start verifying steps TO Enable MFA ---
+
     # If the step is invalid or it's the last step and all previous steps were completed,
     # it's likely the session data is outdated, so we restart the form.
     if step not in STEPS or (not _all_steps_completed(request, STEPS) and request.session[f'verified_{STEPS[-1]}'] == True):
@@ -83,6 +112,7 @@ def enableMFAView(request):
     # Proceed to next step
     next_step = STEPS[STEPS.index(step) + 1]
     return _render_step_modal(request, next_step, STEPS, CONTEXT_BASE)
+
 
 
 def _reset_all_steps(request, steps):

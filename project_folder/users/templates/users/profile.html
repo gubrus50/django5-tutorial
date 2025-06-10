@@ -31,7 +31,7 @@
                         {{ forms.account|crispy }}
                         <hr>
                         <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="mfa-flex-switch"
+                            <input class="form-check-input" type="checkbox" id="mfa-flex-switch" name="switch"
                               {% if user.account.mfa_enabled %}checked{% endif %}
                               hx-post="{% url 'enable_mfa' %}"
                               hx-trigger="click throttle:1s"
@@ -109,8 +109,30 @@ function setNormalButtonForModal(button) {
 </script>
 <script name="main-script" type="text/javascript">
 
+function throttleElement(element, type='click', delay=500) {
+    element.dataset.throttle = false;
+    element.addEventListener(type, event => {
+        if (element.dataset.throttle == 'true') {
+            event.preventDefault(); return;
+        }
+        element.dataset.throttle = true;
+        setTimeout(() => element.dataset.throttle = false, delay);
+    });
+}
+
+
+
 const input_enable_mfa = document.getElementById('mfa-flex-switch');
-const onAnyClosedModal = () => input_enable_mfa.checked = false;
+const onAnyClosedModal = submit => input_enable_mfa.checked = submit == 'Disable';
+
+throttleElement(input_enable_mfa, 'click', parseInt(
+    input_enable_mfa.getAttribute('hx-trigger')
+    .match(/throttle:(\d+(s|ms))/)[1]
+    .replaceAll('ms', '')
+    .replaceAll('s', '000')
+));
+
+
 
 document.addEventListener('htmx:afterRequest', async (event) => {
 

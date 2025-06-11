@@ -1,12 +1,18 @@
 {% extends 'app_name/base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
-
 {% block title %}
 {% if registry %}Register{% else %}Login{% endif %} Page
 {% endblock %}
 
+
+
 {% block content %}
+
+
+{% if not registry %}
+<section id="modals"></section>
+{% endif %}
 
 {% if user.is_authenticated and not registry %}
 <div class="p-3 mb-5 bg-light rounded">
@@ -15,7 +21,10 @@
 </div>
 {% endif %}
 
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data"
+  hx-post="{% url 'login' %}"
+  hx-trigger="click throttle:1s"
+  hx-swap="none">
     {% csrf_token %}
     {{ register_view_forms.profile|crispy }}
     {{ register_view_forms.user|crispy }}
@@ -25,10 +34,19 @@
     </button>
 </form>
 
-{% if not registry %}
+{% if user.is_authenticated and not registry %}
+<p class="float-end">Would you like a new account? <a href="{% url 'register' %}">register now</a></p>
+{% elif not registry %}
 <p class="float-end">Don’t have an account? <a href="{% url 'register' %}">register now</a></p>
 {% else %}
 <p class="float-end">Already have an account? <a href="{% url 'login' %}">login now</a></p>
 {% endif %}
 
+
+{% endblock %}
+
+
+
+{% block base %}
+<script name="modals" src="{% static 'users/js/profile/modals.js' %}"></script>
 {% endblock %}

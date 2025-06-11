@@ -15,9 +15,10 @@
               hx-trigger="submit throttle:200ms"
               hx-swap="none">
                 {% csrf_token %}
+                {% block form %}{% endblock %}
                 <div class="input-group mb-3">
                     {% block input %}{% endblock %}
-                    <input name="step" type="hidden" value="{{ step }}">
+                    <input type="hidden" name="step" value="{{ step }}">
                 </div>
                 <button type="submit" class="btn btn-{% if submit == 'Disable' %}danger{% else %}primary{% endif %} modal-submit-button w-100"
                   hx-post="{{ post_url }}"

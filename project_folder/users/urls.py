@@ -3,11 +3,12 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    path('login', auth_views.LoginView.as_view(template_name='users/form.html'), name='login'),
+    path('login', views.CustomLoginView.as_view(), name='login'),
     path('logout', auth_views.LogoutView.as_view(), name='logout'),
     path('register', views.registerUserView, name='register'),
     path('enable-mfa', views.enableMFAView, name='enable_mfa'),
     path('request-otp/<str:method>', views.requestOTPView, name='request_otp'),
+    path('request-mfa/<str:modal>', views.requestMFAModalView, name='request_mfa'),
     path('profile/<int:user_id>', views.profileView, name='profile'),
 
     path('password-reset/',

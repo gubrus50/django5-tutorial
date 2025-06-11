@@ -36,7 +36,14 @@ ALLOWED_HOSTS = []
 # If you would like to restrict the foreign requests.
 # You'd need to include a new middleware: corsheaders.middleware.CorsMiddleware
 # Specify your allowed origin below: "localhost", "https://my-domain.com"
-ALLOWED_ORIGINS = {}
+if DEBUG:
+    CORS_ALLOWED_ORIGINS = [
+        'http://localhost',
+        'http://127.0.0.1',
+    ]
+else:
+    CORS_ALLOWED_ORIGINS = []
+
 
 
 # Application definition

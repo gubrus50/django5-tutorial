@@ -17,10 +17,12 @@
     <a href="{% if request.user.is_authenticated %}{% url 'profile' request.user.id %}{% else %}{% url 'login' %}{% endif %}" class="float-end">
         <button type="submit" class="btn btn-primary ms-3">profile</button>
     </a>
+    {% if request.user.is_authenticated %}
     <form action="{% url 'logout' %}" method="POST" class="float-end">
         {% csrf_token %}
         <button type="submit" class="btn btn-warning">logout</button>
     </form>
+    {% endif %}
 
 
     

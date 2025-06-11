@@ -3,7 +3,30 @@
 {% load static %}
 
 {% block body %}
-    <p id="{{ step|replace:'_|-' }}-instructions">Enter the one-time password (OTP) sent to your email: <br><strong>{{ request.user.email }}</strong></p>
+    <p id="{{ step|replace:'_|-' }}-instructions">Enter the one-time password (OTP) sent to your email: <br>
+        <strong>{% if email %}{{ email }}{% else %}{{ request.user.email }}{% endif %}</strong>
+    </p>
+    {% if submit == 'Login' %}
+        <hr>
+        <form id="mfa-alternative-options" class="d-flex justify-content-between align-items-center"
+            action="{% url 'request_mfa' 'none' %}"
+            enctype="multipart/form-data"
+            method="POST">
+
+            {% csrf_token %}
+            <input type="hidden" name="user_id" value="{{ user_id }}">
+            <input type="hidden" name="masked_email" value="{{ email }}">
+            <input type="hidden" name="masked_phone_number" value="{{ phone_number }}">
+
+            <p class="w-50 me-2">Return back to try and login with your authentication app</p>
+            <button class="btn btn-outline-primary w-50" type="button"
+                hx-post="{% url 'request_mfa' 'otp_qrcode' %}"
+                hx-trigger="click throttle:1s"
+                hx-swap="none">
+                Authenticate<br>via app
+            </button>
+        </form>
+    {% endif %}
     <hr>
     <div class="d-flex justify-content-between text-center">
         <button type="button" class="btn btn-light w-50 me-4">
@@ -119,6 +142,12 @@
         </script>
     </div>
 {% endblock %}
+
+{% if submit == 'Login' %}
+    {% block form %}
+        <input type="hidden" name="user_id" value="{{ user_id }}">
+    {% endblock %}
+{% endif %}
 
 {% block input %}
     <span class="input-group-text">OTP</span>

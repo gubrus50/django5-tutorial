@@ -3,9 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import User
+from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.conf import settings
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.urls import reverse
 
 from .models import Profile, Account
@@ -19,6 +20,8 @@ from .utils import (
     get_users_mfa_secret_as_qrcode_base64,
     email_otp_to_user,
     sms_otp_to_user,
+    mask_email,
+    mask_phone_number,
 )
 
 import stripe, pyotp
@@ -135,10 +138,12 @@ def _render_step_modal(request, step, all_steps, base_context):
     return render(request, 'users/modals/profile/include.html', context)
 
 
-def _validate_step(request, step):
+def _validate_step(request, step, user):
+    user = user if user is not None else request.user
+
     if step == 'password':
         password = request.POST.get('password')
-        return request.user.check_password(password)
+        return user.check_password(password)
     else:
         otp = request.POST.get('otp_code')
         interval = {
@@ -146,7 +151,7 @@ def _validate_step(request, step):
             'otp_sms': settings.OTP_SMS_INTERVAL
         }.get(step, settings.OTP_DEFAULT_INTERVAL)
 
-        totp = pyotp.TOTP(request.user.account.mfa_secret, interval=interval)
+        totp = pyotp.TOTP(user.account.mfa_secret, interval=interval)
         return totp.verify(otp)
 
 
@@ -173,11 +178,9 @@ def requestOTPView(request, method):
     if request.method != 'POST':
         return HttpResponseBadRequest()
 
-    # Allow requests only from this Django project
-    allowed_origins = ['http://localhost', 'http://127.0.0.1']
-
+    # Allow requests only from CORS_ALLOWED_ORIGINS
     origin = request.headers.get('Origin') or request.headers.get('Referer')
-    if not origin or not any(origin.startswith(o) for o in allowed_origins):
+    if not origin or not any(origin.startswith(o) for o in settings.CORS_ALLOWED_ORIGINS):
         return JsonResponse({'error': 'Unauthorized request'}, status=403)
 
 
@@ -195,6 +198,134 @@ def requestOTPView(request, method):
     # Return invalid method error
     return JsonResponse({'error': 'Invalid method', 'method': method}, status=400)
  
+
+
+
+
+def requestMFAModalView(request, modal):
+    if request.method != 'POST':
+        return HttpResponseBadRequest()
+
+    # Allow requests only from CORS_ALLOWED_ORIGINS
+    origin = request.headers.get('Origin') or request.headers.get('Referer')
+    if not origin or not any(origin.startswith(o) for o in settings.CORS_ALLOWED_ORIGINS):
+        return JsonResponse({'error': 'Unauthorized request'}, status=403)
+    
+    MODALS = ['otp_qrcode', 'otp_email', 'otp_sms']
+
+    if modal not in MODALS:
+        return JsonResponse({'error': 'Invalid modal'}, status=400)
+
+
+    _reset_all_steps(request, MODALS)
+    return render(request, 'users/modals/profile/include.html', {
+        'title': 'Multi-Factor Authentication',
+        'post_url': reverse('login'),
+        'step': modal,
+        'submit': 'Login',
+        'submit_boldend': 'Securly via MFA',
+        # POST data
+        'user_id': request.POST.get('user_id'),
+        'email': request.POST.get('masked_email'),
+        'phone_number': request.POST.get('masked_phone_number'),
+    })
+
+
+
+
+
+
+class CustomLoginView(LoginView):
+    template_name = 'users/form.html'
+    STEPS = ['password', 'otp_qrcode', 'otp_email', 'otp_sms']
+
+
+    def success_redirect(self):
+        # HTMX requests ruin the default redirection. Hence,
+        # success_redirect() method is used to fix this issue.
+        success_url = self.get_success_url()
+        
+        if self.request.headers.get('HX-Request') == 'true':
+            # HTMX-aware response
+            response = HttpResponse()
+            response['HX-Redirect'] = success_url
+            return response
+        else:
+            # Normal browser redirect 
+            return redirect(success_url)
+
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.redirect_authenticated_user and self.request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+
+        step = request.POST.get('step')
+        # Call multi_factor_auth() custom method
+        # IF POST request was made by the "Multi-Factor Authentication" modal
+        if step in self.STEPS and step != 'password':
+            return self.multi_factor_auth(request, *args, **kwargs)
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+
+    def multi_factor_auth(self, request, *args, **kwargs):
+        user_id = int(request.session.get('user_id'))
+        user_id_post = int(request.POST.get('user_id'))
+
+        # Validate "Multi-Factor Authentication" data
+
+        if not user_id or user_id != user_id_post:
+            return JsonResponse({'error': 'UserID mismatch', 'user_id': user_id}, status=400)
+
+        if request.session.get('verified_password') != True:
+            return JsonResponse({'error': 'Unverified password'}, status=400)
+
+        user = get_object_or_404(User, id=user_id)
+        if hasattr(user, 'account') and user.account.mfa_enabled != True:
+            return JsonResponse({'error': 'Disabled MFA'}, status=400)
+
+        step = request.POST.get('step')
+        if not _validate_step(request, step, user):
+            return JsonResponse({'error': _get_validation_error(step), 'step': step}, status=400)
+
+        # Reset used session data AND authenticate the user
+
+        del self.request.session['user_id']
+        _reset_all_steps(request, self.STEPS)
+
+        login(request, user)
+        return self.success_redirect()
+
+
+
+    def form_valid(self, form):
+        # Return "Multi-Factor Authentication" modal IF user has enabled MFA
+        # Otherwise, authenticate the user
+        
+        user = form.get_user()
+        request = self.request
+
+        if hasattr(user, 'account') and user.account.mfa_enabled:
+
+            _reset_all_steps(request, self.STEPS)
+            request.session[f'user_id'] = user.id
+            request.session[f'verified_password'] = True
+
+            return render(request, 'users/modals/profile/include.html', {
+                'title': 'Multi-Factor Authentication',
+                'post_url': reverse('login'),
+                'step': 'otp_qrcode',
+                'submit': 'Login',
+                'submit_boldend': 'Securly via MFA',
+                'email': mask_email(user.email),
+                'phone_number': mask_phone_number(str(user.account.phone_number)),
+                'user_id': user.id,
+            })
+
+        login(request, user)
+        return self.success_redirect()
+
 
 
 

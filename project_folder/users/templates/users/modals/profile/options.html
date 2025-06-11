@@ -1,0 +1,27 @@
+<form id="mfa-alternative-options"
+    action="{% url 'request_mfa' 'none' %}"
+    enctype="multipart/form-data"
+    method="POST">
+    
+    {% csrf_token %}
+    <input type="hidden" name="user_id" value="{{ user_id }}">
+    <input type="hidden" name="masked_email" value="{{ email }}">
+    <input type="hidden" name="masked_phone_number" value="{{ phone_number }}">
+
+    <h5>Alternative options</h5>
+    <hr>
+    <p>Send OTP via</p>
+    <button class="btn btn-outline-primary w-100 mb-1" type="button"
+        hx-post="{% url 'request_mfa' 'otp_email' %}"
+        hx-trigger="click throttle:1s"
+        hx-swap="none">
+        <strong>Email</strong>
+    </button>
+    <button class="btn btn-outline-primary w-100" type="button"
+        hx-post="{% url 'request_mfa' 'otp_sms' %}"
+        hx-trigger="click throttle:1s"
+        hx-swap="none">
+        <strong>SMS</strong>
+    </button>
+
+</form>

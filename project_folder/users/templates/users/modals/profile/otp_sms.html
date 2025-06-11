@@ -7,9 +7,31 @@
         Enter the one-time password (OTP) sent to your mobile via text:
         <br>
         <span class="phone-number d-block fs-5">
-            <strong>{{ request.user.profile.phone_number }}</strong>
+            <strong>{% if submit == 'Login' %}{{ phone_number }}{% else %}{{ request.user.profile.phone_number }}{% endif %}</strong>
         </span>
-        <br>to finalize <strong>Multi-Factor Authentication</strong>
+        {% if submit == 'Login' %}
+            <hr>
+            <form id="mfa-alternative-options" class="d-flex justify-content-between align-items-center"
+                action="{% url 'request_mfa' 'none' %}"
+                enctype="multipart/form-data"
+                method="POST">
+                
+                {% csrf_token %}
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+                <input type="hidden" name="masked_email" value="{{ email }}">
+                <input type="hidden" name="masked_phone_number" value="{{ phone_number }}">
+
+                <p class="w-50 me-2">Return back to try and login with your authentication app</p>
+                <button class="btn btn-outline-primary w-50" type="button"
+                    hx-post="{% url 'request_mfa' 'otp_qrcode' %}"
+                    hx-trigger="click throttle:1s"
+                    hx-swap="none">
+                    Authenticate<br>via app
+                </button>
+            </form>
+        {% else %}
+            <br>to finalize <strong>Multi-Factor Authentication</strong>
+        {% endif %}
     </p>
     <hr>
     <div class="d-flex justify-content-between text-center">
@@ -126,6 +148,12 @@
         </script>
     </div>
 {% endblock %}
+
+{% if submit == 'Login' %}
+    {% block form %}
+        <input type="hidden" name="user_id" value="{{ user_id }}">
+    {% endblock %}
+{% endif %}
 
 {% block input %}
     <span class="input-group-text">OTP</span>

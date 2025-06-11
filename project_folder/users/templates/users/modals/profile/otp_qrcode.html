@@ -30,7 +30,21 @@
     </div>
     {% endif %}
     <div class="d-flex justify-content-between">
+    {% if submit == 'Login' %}
+        <div id="{{ step|replace:'_|-' }}-instructions">
+            <ol class="ps-3">
+                <li>Open your authentication app.</li>
+                <li>Locate the OTP for your account.</li>
+                <li>Enter the OTP in the verification field.</li>
+            </ol>
+            {% include 'users/modals/profile/options.html' %}
+            {% block form %}
+                <input type="hidden" name="user_id" value="{{ user_id }}">
+            {% endblock %}
+        </div>
+    {% else %}
         <img class="w-75 border rounded-2" style="max-width: 300px;" src="{{ qrcode_data_uri }}" alt="Failed to load - QR Code">
+    {% endif %}
         <img class="w-auto" style="max-width: 150px;" src="{% static 'users/img/authenticator_apps.png' %}">
     </div>
 {% endblock %}

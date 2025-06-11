@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from twilio.rest import Client
 
-import io, base64, requests, stripe, boto3, pyotp, qrcode
+import io, base64, requests, stripe, boto3, pyotp, qrcode, re
 from botocore.exceptions import ClientError
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -297,3 +297,45 @@ def sms_otp_to_user(user_instance):
     )
 
     return otp
+
+
+
+
+def mask_email(email, visible_chars=1): 
+    # Function to mask part of an email address for privacy.
+    # 'visible_chars' determines how many characters of the username remain visible.
+
+    name, domain = email.split('@')  
+    # Splits the email into two parts: 'name' (before @) and 'domain' (after @).
+
+    masked_part = '*' * (len(name) - visible_chars)  
+    # Generates a string of '*' characters, masking all but the first 'visible_chars' characters of the name.
+
+    return f"{name[:visible_chars]}{masked_part}@{domain}"  
+    # Constructs the masked email by keeping the first 'visible_chars' characters,
+    # replacing the rest with '*', and appending the unchanged domain.
+
+
+
+
+
+
+def mask_phone_number(phone_number: str) -> str:
+    """
+    Masks the middle digits of an E.164 formatted phone number.
+    Preserves the country code and the last two digits.
+    
+    Args:
+        phone_number (str): The phone number in E.164 format (e.g., +447712345678).
+    
+    Returns:
+        str: Masked phone number (e.g., +44********78).
+    """
+    match = re.match(r"(\+\d{1,2})(\d+)(\d{2})$", phone_number)
+    if not match:
+        raise ValueError("Invalid E.164 phone number format")
+    
+    country_code, middle_part, last_visible = match.groups()
+    masked_middle = '*' * len(middle_part)
+
+    return f"{country_code}{masked_middle}{last_visible}"

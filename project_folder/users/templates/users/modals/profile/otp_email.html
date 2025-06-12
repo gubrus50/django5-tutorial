@@ -2,6 +2,7 @@
 {% load custom_filters %}
 {% load static %}
 
+
 {% block body %}
     <p id="{{ step|replace:'_|-' }}-instructions">Enter the one-time password (OTP) sent to your email: <br>
         <strong>{% if email %}{{ email }}{% else %}{{ request.user.email }}{% endif %}</strong>
@@ -12,11 +13,7 @@
             action="{% url 'request_mfa' 'none' %}"
             enctype="multipart/form-data"
             method="POST">
-
-            {% csrf_token %}
-            <input type="hidden" name="user_id" value="{{ user_id }}">
-            <input type="hidden" name="masked_email" value="{{ email }}">
-            <input type="hidden" name="masked_phone_number" value="{{ phone_number }}">
+            {% include 'users/modals/profile/data/in_circulation.html' %}
 
             <p class="w-50 me-2">Return back to try and login with your authentication app</p>
             <button class="btn btn-outline-primary w-50" type="button"
@@ -143,11 +140,13 @@
     </div>
 {% endblock %}
 
+
 {% if submit == 'Login' %}
     {% block form %}
-        <input type="hidden" name="user_id" value="{{ user_id }}">
+        {% include 'users/modals/profile/data/session_copy.html' %}
     {% endblock %}
 {% endif %}
+
 
 {% block input %}
     <span class="input-group-text">OTP</span>

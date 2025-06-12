@@ -1,0 +1,21 @@
+{% comment %}
+
+Since HX-POST does not preserve data across requests,
+essential details like "masked_(email)" and "masked_(phone_number)"
+sent from the backend are lost when a client requests an Email or SMS modal
+(for alternative One-Time Password (OTP) submission).
+
+To mitigate this issue:
+
+- The relevant data is embedded within below specified <input> elements before sending the request.
+- When requestMFAModalView() handles the request, it retrieves these values from the inputs.
+- The backend then returns the same data, ensuring it is available for template rendering of requested modals.
+
+{% endcomment %}
+
+<!-- POST data (in circulation) -->
+{% csrf_token %}
+<input type="hidden" name="next" value="{{ next }}">
+<input type="hidden" name="user_id" value="{{ user_id }}">
+<input type="hidden" name="masked_email" value="{{ email }}">
+<input type="hidden" name="masked_phone_number" value="{{ phone_number }}">

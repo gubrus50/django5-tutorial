@@ -2,6 +2,7 @@
 {% load custom_filters %}
 {% load static %}
 
+
 {% block body %}
     {% if qrcode_data_uri %}
     <div id="{{ step|replace:'_|-' }}-instructions">
@@ -38,9 +39,6 @@
                 <li>Enter the OTP in the verification field.</li>
             </ol>
             {% include 'users/modals/profile/options.html' %}
-            {% block form %}
-                <input type="hidden" name="user_id" value="{{ user_id }}">
-            {% endblock %}
         </div>
     {% else %}
         <img class="w-75 border rounded-2" style="max-width: 300px;" src="{{ qrcode_data_uri }}" alt="Failed to load - QR Code">
@@ -48,6 +46,14 @@
         <img class="w-auto" style="max-width: 150px;" src="{% static 'users/img/authenticator_apps.png' %}">
     </div>
 {% endblock %}
+
+
+{% if submit == 'Login' %}
+    {% block form %}
+        {% include 'users/modals/profile/data/session_copy.html' %}
+    {% endblock %}
+{% endif %}
+
 
 {% block input %}
     <span class="input-group-text">OTP</span>

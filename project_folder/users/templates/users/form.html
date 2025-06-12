@@ -22,10 +22,13 @@
 {% endif %}
 
 <form method="post" enctype="multipart/form-data"
-  hx-post="{% url 'login' %}"
+  hx-post="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
   hx-trigger="click throttle:1s"
   hx-swap="none">
     {% csrf_token %}
+    {% if request.GET.next %}
+    <input type="hidden" name="next" value="{{ request.GET.next }}">
+    {% endif %}
     {{ register_view_forms.profile|crispy }}
     {{ register_view_forms.user|crispy }}
     {{ form|crispy }}

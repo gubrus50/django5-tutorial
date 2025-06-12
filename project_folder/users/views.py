@@ -211,12 +211,16 @@ def requestMFAModalView(request, modal):
     if not origin or not any(origin.startswith(o) for o in settings.CORS_ALLOWED_ORIGINS):
         return JsonResponse({'error': 'Unauthorized request'}, status=403)
     
+    # Validate requested modal
     MODALS = ['otp_qrcode', 'otp_email', 'otp_sms']
-
     if modal not in MODALS:
         return JsonResponse({'error': 'Invalid modal'}, status=400)
 
+    # None ➡ <input value="None"> ➡ "None" (Type: String)
+    next_url = request.POST.get('next')
+    next_url = None if next_url in ['None', 'null', 'False'] else next_url
 
+    # Return the modal
     _reset_all_steps(request, MODALS)
     return render(request, 'users/modals/profile/include.html', {
         'title': 'Multi-Factor Authentication',
@@ -224,7 +228,8 @@ def requestMFAModalView(request, modal):
         'step': modal,
         'submit': 'Login',
         'submit_boldend': 'Securly via MFA',
-        # POST data
+        # HX-POST data (in circulation)
+        'next': next_url,
         'user_id': request.POST.get('user_id'),
         'email': request.POST.get('masked_email'),
         'phone_number': request.POST.get('masked_phone_number'),
@@ -244,7 +249,7 @@ class CustomLoginView(LoginView):
         # HTMX requests ruin the default redirection. Hence,
         # success_redirect() method is used to fix this issue.
         success_url = self.get_success_url()
-        
+
         if self.request.headers.get('HX-Request') == 'true':
             # HTMX-aware response
             response = HttpResponse()
@@ -270,16 +275,27 @@ class CustomLoginView(LoginView):
 
 
     def multi_factor_auth(self, request, *args, **kwargs):
-        user_id = int(request.session.get('user_id'))
-        user_id_post = int(request.POST.get('user_id'))
 
-        # Validate "Multi-Factor Authentication" data
-
-        if not user_id or user_id != user_id_post:
-            return JsonResponse({'error': 'UserID mismatch', 'user_id': user_id}, status=400)
+        # Validate - "session" data
 
         if request.session.get('verified_password') != True:
             return JsonResponse({'error': 'Unverified password'}, status=400)
+
+        user_id = request.session.get('user_id')
+        user_id = str(user_id) if user_id is not None else None
+        user_id_post = request.POST.get('user_id')
+
+        if not user_id or user_id != user_id_post:
+            return JsonResponse({'error': 'Empty or mismatched user_id', 'user_id': user_id}, status=400)
+        
+        next_url = request.session.get('next')
+        next_url_post = request.POST.get('next')
+        next_url_post = None if next_url in ['None', 'null', 'False'] else next_url
+
+        if not next_url or next_url != next_url_post:
+            return JsonResponse({'error': 'Empty or mismatched next_url', 'next_url': next_url}, status=400)
+
+        # Validate - "Multi-Factor Authentication" data
 
         user = get_object_or_404(User, id=user_id)
         if hasattr(user, 'account') and user.account.mfa_enabled != True:
@@ -290,7 +306,8 @@ class CustomLoginView(LoginView):
             return JsonResponse({'error': _get_validation_error(step), 'step': step}, status=400)
 
         # Reset used session data AND authenticate the user
-
+        
+        del self.request.session['next']
         del self.request.session['user_id']
         _reset_all_steps(request, self.STEPS)
 
@@ -302,15 +319,16 @@ class CustomLoginView(LoginView):
     def form_valid(self, form):
         # Return "Multi-Factor Authentication" modal IF user has enabled MFA
         # Otherwise, authenticate the user
-        
         user = form.get_user()
         request = self.request
 
         if hasattr(user, 'account') and user.account.mfa_enabled:
-
+            # Note: POST data (in circulation) includes some session data
+            # These are used later to check if POST data matches the session
             _reset_all_steps(request, self.STEPS)
             request.session[f'user_id'] = user.id
             request.session[f'verified_password'] = True
+            request.session[f'next'] = request.GET.get('next')
 
             return render(request, 'users/modals/profile/include.html', {
                 'title': 'Multi-Factor Authentication',
@@ -318,13 +336,16 @@ class CustomLoginView(LoginView):
                 'step': 'otp_qrcode',
                 'submit': 'Login',
                 'submit_boldend': 'Securly via MFA',
+                # Initial data for, in circulation, HX-POST requests
+                'user_id': user.id,
+                'next': request.GET.get('next'),
                 'email': mask_email(user.email),
                 'phone_number': mask_phone_number(str(user.account.phone_number)),
-                'user_id': user.id,
             })
 
-        login(request, user)
-        return self.success_redirect()
+        else:
+            login(request, user)
+            return self.success_redirect()
 
 
 

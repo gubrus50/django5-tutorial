@@ -1,6 +1,10 @@
 <section id="modals" hx-swap-oob="innerHTML">
-    {% with model_path='users/modals/profile/'|add:step|add:".html" %}
-        {% include model_path with title=title post_url=post_url step=step page=page submit=submit submit_boldend=submit_boldend %}
+    {% with model_path='users/modals/profile/'|add:step|add:'.html' %}
+        {% with redirect_url=post_url|add:'?next='|add:next %}
+            {% with choice_url=redirect_url|add:','|add:post_url %}
+                {% include model_path with title=title post_url=next|yesno:choice_url step=step page=page submit=submit submit_boldend=submit_boldend %}
+            {% endwith %}
+        {% endwith %}
     {% endwith %}
     <script type="text/javascript">
         // Global access to currently loaded modal element

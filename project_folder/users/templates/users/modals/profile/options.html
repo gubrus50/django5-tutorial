@@ -2,11 +2,7 @@
     action="{% url 'request_mfa' 'none' %}"
     enctype="multipart/form-data"
     method="POST">
-    
-    {% csrf_token %}
-    <input type="hidden" name="user_id" value="{{ user_id }}">
-    <input type="hidden" name="masked_email" value="{{ email }}">
-    <input type="hidden" name="masked_phone_number" value="{{ phone_number }}">
+    {% include 'users/modals/profile/data/in_circulation.html' %}
 
     <h5>Alternative options</h5>
     <hr>

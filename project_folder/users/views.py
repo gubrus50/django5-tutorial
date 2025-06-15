@@ -138,7 +138,7 @@ def _render_step_modal(request, step, all_steps, base_context):
     return render(request, 'users/modals/profile/include.html', context)
 
 
-def _validate_step(request, step, user):
+def _validate_step(request, step, user=None):
     user = user if user is not None else request.user
 
     if step == 'password':
@@ -173,7 +173,7 @@ def _all_steps_completed(request, steps):
 
 
 
-@login_required
+
 def requestOTPView(request, method):
     if request.method != 'POST':
         return HttpResponseBadRequest()
@@ -183,15 +183,20 @@ def requestOTPView(request, method):
     if not origin or not any(origin.startswith(o) for o in settings.CORS_ALLOWED_ORIGINS):
         return JsonResponse({'error': 'Unauthorized request'}, status=403)
 
-
+    # Get User ID
+    user_id = request.user.id if request.user.is_authenticated else request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'error': 'User not identified'}, status=400)
+    
     # Send OTP to user via specified method: (email | sms)
+    user_instance = get_object_or_404(User, id=user_id)
     send_otp_via = {
         'email': email_otp_to_user,
         'sms': sms_otp_to_user
     }
     
     if method in send_otp_via:
-        send_otp_via[method](request.user)
+        send_otp_via[method](user_instance)
         return JsonResponse({'success': 'OTP Sent', 'method': method}, status=200)
 
 
@@ -215,6 +220,21 @@ def requestMFAModalView(request, modal):
     MODALS = ['otp_qrcode', 'otp_email', 'otp_sms']
     if modal not in MODALS:
         return JsonResponse({'error': 'Invalid modal'}, status=400)
+
+
+    # Get User ID
+    user_id = request.user.id if request.user.is_authenticated else request.session.get('user_id')
+    if not user_id:
+        return JsonResponse({'error': 'User not identified'}, status=400)
+
+    # Send OTP to user
+    user_instance = get_object_or_404(User, id=user_id)
+
+    if modal == 'otp_email':
+        email_otp_to_user(user_instance)
+    elif modal == 'otp_sms':
+        sms_otp_to_user(user_instance)
+
 
     # None ➡ <input value="None"> ➡ "None" (Type: String)
     next_url = request.POST.get('next')
@@ -286,14 +306,15 @@ class CustomLoginView(LoginView):
         user_id_post = request.POST.get('user_id')
 
         if not user_id or user_id != user_id_post:
-            return JsonResponse({'error': 'Empty or mismatched user_id', 'user_id': user_id}, status=400)
+            return JsonResponse({'error': 'Empty or mismatched', 'user_id': user_id}, status=400)
         
         next_url = request.session.get('next')
+        # None ➡ <input value="None"> ➡ "None" (Type: String)
         next_url_post = request.POST.get('next')
-        next_url_post = None if next_url in ['None', 'null', 'False'] else next_url
+        next_url_post = None if next_url_post in ['None', 'null', 'False'] else next_url_post
 
-        if not next_url or next_url != next_url_post:
-            return JsonResponse({'error': 'Empty or mismatched next_url', 'next_url': next_url}, status=400)
+        if next_url != next_url_post:
+            return JsonResponse({'error': 'Mismatched', 'next_url': next_url}, status=400)
 
         # Validate - "Multi-Factor Authentication" data
 

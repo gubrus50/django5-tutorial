@@ -80,7 +80,10 @@ def enableMFAView(request):
 
     # If the step is invalid or it's the last step and all previous steps were completed,
     # it's likely the session data is outdated, so we restart the form.
-    if step not in STEPS or (not _all_steps_completed(request, STEPS) and request.session[f'verified_{STEPS[-1]}'] == True):
+    if step not in STEPS or (
+        not _all_steps_completed(request, STEPS)
+        and request.session.get(f'verified_{STEPS[-1]}', False)
+    ):
         _reset_all_steps(request, STEPS)
         # If valid step and IS NOT a first step
         if step in STEPS and step != STEPS[0]:
@@ -117,9 +120,11 @@ def enableMFAView(request):
 
 
 def _reset_all_steps(request, steps):
-    # Reset verification status
+    # Reset verification status by removing it from the session
     for step_name in steps:
-        request.session[f'verified_{step_name}'] = False
+        session_key = f'verified_{step_name}'
+        if session_key in request.session:
+            del request.session[session_key]
 
 
 def _render_step_modal(request, step, all_steps, base_context):
@@ -140,6 +145,8 @@ def _render_step_modal(request, step, all_steps, base_context):
 
 def _validate_step(request, step, user=None):
     user = user if user is not None else request.user
+    if not user:
+        raise ValueError('User not identified')
 
     if step == 'password':
         password = request.POST.get('password')
@@ -156,7 +163,12 @@ def _validate_step(request, step, user=None):
 
 
 def _get_validation_error(step):
-    return 'Invalid password' if step == 'password' else 'Invalid OTP'
+    if step == 'password':
+        return 'Invalid password'
+    elif 'otp_' in step:
+        return 'Invalid OTP'
+    else:
+        return 'Invalid step' 
 
 
 def _handle_post_validation(request, step):
@@ -306,7 +318,7 @@ class CustomLoginView(LoginView):
         user_id_post = request.POST.get('user_id')
 
         if not user_id or user_id != user_id_post:
-            return JsonResponse({'error': 'Empty or mismatched', 'user_id': user_id}, status=400)
+            return JsonResponse({'error': 'Empty or mismatched user_id', 'user_id': user_id}, status=400)
         
         next_url = request.session.get('next')
         # None ➡ <input value="None"> ➡ "None" (Type: String)
@@ -314,7 +326,7 @@ class CustomLoginView(LoginView):
         next_url_post = None if next_url_post in ['None', 'null', 'False'] else next_url_post
 
         if next_url != next_url_post:
-            return JsonResponse({'error': 'Mismatched', 'next_url': next_url}, status=400)
+            return JsonResponse({'error': 'Mismatched next_url', 'next_url': next_url}, status=400)
 
         # Validate - "Multi-Factor Authentication" data
 

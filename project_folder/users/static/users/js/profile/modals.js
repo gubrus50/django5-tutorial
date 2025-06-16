@@ -30,7 +30,7 @@ document.addEventListener('htmx:afterRequest', async (event) => {
     let form = event.detail.target.closest('form');
     if (!form?.classList.contains('modal-footer')) return;
 
-
+    
     // Receive response from the backend
 
     let xhr = event.detail.xhr,
@@ -45,13 +45,47 @@ document.addEventListener('htmx:afterRequest', async (event) => {
 
     // Handle response
 
+    let modal_body = form.parentElement.querySelector('.modal-body'),
+        button_submit = form.querySelector('.modal-submit-button'),
+        input_otp = form.querySelector('input[name="otp_code"]');
+
+
     if (response.error) {
-        console.error(response.error);
+        // Report ERROR to the console & technical report <details>
+        if (/Empty or mismatched|Mismatched/g.test(response.error)) {
+            let msg = response.error, err = arg = '';
+
+            arg = msg.replace(/Empty or mismatched|Mismatched/g, '').trim();
+            err = msg.replace(arg, '').trim();
+            msg += ': ' + response[arg];
+
+            modal_body.innerHTML = `
+                <p>Something went wrong, please restart or try again later.</p>
+                <hr>
+                <details open>
+                    <summary>Technical Report</summary>
+                    <span class="badge bg-danger">ERROR ${xhr.status}</span>
+                    <span class="badge bg-warning text-dark">${err}</span>
+                    <span class="badge bg-secondary">ARG ${arg}</span>
+                    <span class="badge bg-light text-dark">ISET ${response[arg]}</span>
+                </details>
+            `;
+    
+            // Report ERROR & Disable - OTP <input> & Submit <button>
+            button_submit.setAttribute('disabled', '');
+            input_otp.setAttribute('disabled', '');
+            console.error(msg);
+        }
+        else {
+            console.error(response.error);
+        }
     }
+
+
     if (response.success) {
         hideModals();
     }
-    else if (response.error === 'Invalid OTP' || 'Invalid password') {
+    else if (/Invalid OTP|Invalid password/g.test(response.error)) {
         let input = form.querySelector('input:not([type="hidden"])');
         setInvalidInput(input);
     }
@@ -59,7 +93,6 @@ document.addEventListener('htmx:afterRequest', async (event) => {
 
     // Reset modal's submit button
 
-    let button_submit = form.querySelector('.modal-submit-button');
     setNormalButtonForModal(button_submit);
 
 });

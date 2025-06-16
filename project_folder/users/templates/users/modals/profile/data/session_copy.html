@@ -17,4 +17,7 @@ the "Multi-Factor Authentication" (MFA) modal to reset before proceeding.
   {# 'next' cannot be present when 'None' otherwise there will be issues with redirection #}
   <input type="hidden" name="next" value="{{ next }}">
 {% endif %}
-<input type="hidden" name="user_id" value="{{ user_id }}">
+{% if user_id %}
+  {# 'user_id' is not required when Enabling MFA #}
+  <input type="hidden" name="user_id" value="{{ user_id }}">
+{% endif %}

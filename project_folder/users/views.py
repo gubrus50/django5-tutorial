@@ -148,12 +148,12 @@ def _render_step_modal(request, step, all_steps, base_context):
         'submit': 'Enable' if is_last_step else 'Proceed to the next step',
         'submit_boldend': 'Multi-Factor Authentication' if is_last_step else '',
     }
-    if step != 'password' and step != 'otp_qrcode':
-        # Include OTP_REQUEST_THROTTLE_INTERVAL used in resend_otp.html <component>
-        context['OTP_REQUEST_THROTTLE_INTERVAL'] = settings.OTP_REQUEST_THROTTLE_INTERVAL
-
     if step == 'otp_qrcode':
         context['qrcode_data_uri'] = get_users_mfa_secret_as_qrcode_base64(request.user)
+        
+    elif step != 'password':
+        # Include OTP_REQUEST_THROTTLE_INTERVAL used in resend_otp.html <component>
+        context['OTP_REQUEST_THROTTLE_INTERVAL'] = settings.OTP_REQUEST_THROTTLE_INTERVAL
 
     response = render(request, 'users/includes/modal.html', context)
     # Set throttle OTP request (cookie)

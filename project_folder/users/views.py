@@ -148,7 +148,10 @@ def _render_step_modal(request, step, all_steps, base_context):
         'submit': 'Enable' if is_last_step else 'Proceed to the next step',
         'submit_boldend': 'Multi-Factor Authentication' if is_last_step else '',
     }
-    
+    if step != 'password' and step != 'otp_qrcode':
+        # Include OTP_REQUEST_THROTTLE_INTERVAL used in resend_otp.html <component>
+        context['OTP_REQUEST_THROTTLE_INTERVAL'] = settings.OTP_REQUEST_THROTTLE_INTERVAL
+
     if step == 'otp_qrcode':
         context['qrcode_data_uri'] = get_users_mfa_secret_as_qrcode_base64(request.user)
 
@@ -267,7 +270,6 @@ def requestMFAModalView(request, modal):
         return HttpResponseBadRequest()
 
     MODALS = ['otp_qrcode', 'otp_email', 'otp_sms']
-    expiry_date = OTPThrottle.get(request, source='session')
     origin = request.headers.get('Origin') or request.headers.get('Referer')
     user_id = request.user.id if request.user.is_authenticated else request.session.get('user_id')
 
@@ -317,6 +319,9 @@ def requestMFAModalView(request, modal):
         'user_id': request.POST.get('user_id'),
         'email': request.POST.get('masked_email'),
         'phone_number': request.POST.get('masked_phone_number'),
+        # Include OTP_REQUEST_THROTTLE_INTERVAL used in resend_otp.html <component>
+        **({'OTP_REQUEST_THROTTLE_INTERVAL': settings.OTP_REQUEST_THROTTLE_INTERVAL} 
+        if modal != 'otp_qrcode' else {})
     })
 
 

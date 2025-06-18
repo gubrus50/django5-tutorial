@@ -96,7 +96,7 @@
 
             function setThrottle() {
                 if (isIntervalActive) return;
-                count = TREDSecondsLeft() ?? 45;
+                count = TREDSecondsLeft() ?? {{ OTP_REQUEST_THROTTLE_INTERVAL }};
 
                 button.setAttribute('disabled', '');
                 countTxt.classList.remove('text-secondary');

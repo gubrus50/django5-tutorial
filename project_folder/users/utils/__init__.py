@@ -318,8 +318,6 @@ def mask_email(email, visible_chars=1):
 
 
 
-
-
 def mask_phone_number(phone_number: str) -> str:
     """
     Masks the middle digits of an E.164 formatted phone number.

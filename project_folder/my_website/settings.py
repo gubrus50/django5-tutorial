@@ -275,9 +275,12 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_TEST_KEY') if DEBUG else os.getenv(
 # One-Time Password for Multi-Factor Authentication
 
 OTP_ISSUER_NAME = COMPANY_NAME
-OTP_DEFAULT_INTERVAL = 30 # 30 seconds
-OTP_EMAIL_INTERVAL = 180 # 3 minutes
-OTP_SMS_INTERVAL = 180 # 3 minutes
+OTP_TRED_NAME = 'throttle_otp_request_expiry_date'
+OTP_REQUEST_THROTTLE_INTERVAL = 45
+OTP_DEFAULT_INTERVAL = 30 #   seconds
+OTP_EMAIL_INTERVAL = 180  # 3 minutes
+OTP_SMS_INTERVAL = 180    # 3 minutes
+
 
 
 # Twilio API keys

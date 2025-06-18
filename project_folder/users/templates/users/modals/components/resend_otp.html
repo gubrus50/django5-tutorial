@@ -1,0 +1,150 @@
+{% load static %}
+<div class="d-flex justify-content-between text-center">
+    <button type="button" class="btn btn-light w-50 me-4">
+        <span class="spinner-border text-secondary visually-hidden" role="status" aria-hidden="true"></span>
+        <span class="button-text">Resend OTP</span>
+    </button>
+    <p class="count-text text-secondary px-auto m-auto fs-2 w-25">
+        <span class="count-down">--</span>
+        <br><span class="fs-5">sec</span>
+    </p>
+    <img style="max-height: 150px" src="{% static image_path %}" alt="{{ image_name }}">
+    <script type="text/javascript">
+        (() => {
+
+            let script = document.currentScript,
+                parent = script.parentElement,
+
+                counter = parent.querySelector('.count-down'),
+                countTxt = parent.querySelector('.count-text'),
+                button = parent.querySelector('.btn'),
+
+                buttonTxt = button.querySelector('.button-text'),
+                spinner = button.querySelector('.spinner-border'),
+
+                timeout = null,
+                fallback = null,
+                interval = null,
+                isIntervalActive = false,
+                count = 0;
+            
+
+            function countDown() {
+                counter.innerText = count;
+                if (count > 0) count -= 1;
+                else {
+                    clearInterval(interval);
+                    button.removeAttribute('disabled');
+                    countTxt.classList.add('text-secondary');
+                    isIntervalActive = false;
+                }
+            }
+            
+
+            function TREDSecondsLeft() {
+                /* TRED = Throttle Request Expiry-Date
+                /
+                / Get the expiry date cookie. Notes:
+                /   - cookie's date format should be that of: ISO 8601
+                /   - up-to-date cookie should be provided with each response
+                /   - cookie should be initially provided with this <component>
+                */
+                const cookie = getCookie('throttle_otp_request_expiry_date');
+                
+                // Parse the date if cookie exists
+                const expiryDate = cookie ? new Date(cookie) : null;
+                
+                // Validate the date and calculate remaining seconds
+                if (expiryDate && !isNaN(expiryDate.getTime())) {
+                    const now = new Date();
+                    const secondsLeft = Math.floor((expiryDate - now) / 1000) + 1;
+                    return secondsLeft > 0 ? secondsLeft : 0; // Return 0 if expired
+                }
+                
+                // Return null if no valid expiry date found
+                return null;
+            }
+
+
+            button.addEventListener('click', () => {
+                if (count > 0) return;
+                /* Request new OTP code AND send it TO:
+                /   - user's contact method = email|sms (specified in the post_url)
+                /
+                /  https://htmx.org/api/#ajax
+                */
+                htmx.ajax('POST', '{{ post_url }}', {
+                    swap: 'none',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    }
+                });
+                timeout = setTimeout(() => {
+                    spinner.classList.remove('visually-hidden');
+                    buttonTxt.classList.add('visually-hidden');
+                }, 500);
+
+
+                // Set fallback execution after 15 seconds
+                fallback = setTimeout(() => {
+                    console.warn('No response received in 15 seconds, executing fallback.');
+                    buttonTxt.classList.remove('visually-hidden'); 
+                    spinner.classList.add('visually-hidden');
+                }, 15000);
+            });
+
+
+            function setThrottle() {
+                if (isIntervalActive) return;
+                count = TREDSecondsLeft() ?? 45;
+
+                button.setAttribute('disabled', '');
+                countTxt.classList.remove('text-secondary');
+
+                isIntervalActive = true;
+                if (interval) clearInterval(interval);
+                countDown(); // Immediately show the count
+                interval = setInterval(countDown, 1000);
+                
+                buttonTxt.classList.remove('visually-hidden'); 
+                spinner.classList.add('visually-hidden');
+            }
+            // Throttle initially
+            setThrottle();
+
+
+            document.addEventListener('htmx:afterRequest', async (event) => {
+                if (event.detail.pathInfo.requestPath !== '{{ post_url }}') return;
+
+                // Receive response from the backend
+
+                let xhr = event.detail.xhr;
+                    responseText = await xhr.responseText,
+                    response = '';
+
+                if (xhr.getResponseHeader('Content-Type')?.includes('application/json')) {
+                    response = JSON.parse(responseText);
+                }
+                else return;
+
+                // Cancel the timeout & fallback execution if response is received
+
+                clearTimeout(timeout);
+                clearTimeout(fallback);
+
+                // Handle response
+
+                if (response.success === 'OTP Sent') {
+                   setThrottle();
+                }
+                else if (response.error) {
+                    console.error(response.error);
+                }
+
+            });
+
+            script.remove();
+
+        })();
+    </script>
+</div>

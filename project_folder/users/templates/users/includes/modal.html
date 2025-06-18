@@ -1,5 +1,5 @@
 <section id="modals" hx-swap-oob="innerHTML">
-    {% with model_path='users/modals/profile/'|add:step|add:'.html' %}
+    {% with model_path='users/modals/'|add:path|add:step|add:'.html' %}
         {% if next %}
             {% with post_url=post_url|add:'?next='|add:next %}
                 {% include model_path with title=title post_url=post_url step=step page=page submit=submit submit_boldend=submit_boldend %}

@@ -9,6 +9,7 @@ from django.conf import settings
 from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.urls import reverse
 
+
 from .models import Profile, Account
 from .forms import (
     UserRegisterForm,
@@ -16,6 +17,7 @@ from .forms import (
     ProfileForm,
     AccountForm,
 )
+from .utils.throttle import ThrottleOTPRequestExpiryDate as OTPThrottle
 from .utils import (
     get_users_mfa_secret_as_qrcode_base64,
     email_otp_to_user,
@@ -26,6 +28,7 @@ from .utils import (
 
 import stripe, pyotp
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
 
 
 
@@ -68,7 +71,8 @@ def enableMFAView(request):
                 return JsonResponse({'success': 'Disabled MFA'}, status=200)
 
         _reset_all_steps(request, STEPS)
-        return render(request, 'users/modals/profile/include.html', {
+        return render(request, 'users/includes/modal.html', {
+            'path': '',
             'title': 'Disable MFA',
             'post_url': reverse('enable_mfa'),
             'step': 'password',
@@ -104,10 +108,16 @@ def enableMFAView(request):
 
     # Check if all steps are completed
     if _all_steps_completed(request, STEPS):
+        # Enable MFA
         request.user.account.mfa_enabled = True
         request.user.account.save()
+        # Clear used session data
         _reset_all_steps(request, STEPS)
-        return JsonResponse({'success': 'Enabled MFA', 'step': step}, status=200)
+        OTPThrottle.remove_session(request)
+        # Generate response AND clear used cookie data
+        response = JsonResponse({'success': 'Enabled MFA', 'step': step}, status=200)
+        OTPThrottle.remove_cookie(response)
+        return response
 
     # Handle final step verification failure
     if step == STEPS[-1]:
@@ -132,6 +142,7 @@ def _render_step_modal(request, step, all_steps, base_context):
     
     context = {
         **base_context,
+        'path': 'mfa/' if step != 'password' else '',
         'step': step,
         'page': f'{all_steps.index(step) + 1}/{len(all_steps)}',
         'submit': 'Enable' if is_last_step else 'Proceed to the next step',
@@ -140,7 +151,13 @@ def _render_step_modal(request, step, all_steps, base_context):
     
     if step == 'otp_qrcode':
         context['qrcode_data_uri'] = get_users_mfa_secret_as_qrcode_base64(request.user)
-    return render(request, 'users/modals/profile/include.html', context)
+
+    response = render(request, 'users/includes/modal.html', context)
+    # Set throttle OTP request (cookie)
+    # Keep cookie updated in case of manual removal to prevent 'counter' issues
+    OTPThrottle.set_cookie(request, response)
+
+    return response
 
 
 def _validate_step(request, step, user=None):
@@ -172,6 +189,22 @@ def _get_validation_error(step):
 
 
 def _handle_post_validation(request, step):
+    # TRED = Throttle Request Expiry-Date
+    tred_expired = OTPThrottle.has_expired(request)
+    expiry_date = OTPThrottle.get(request, source='session')
+
+    # Throttle OTP request (via session)
+    if not tred_expired and step in ['otp_qrcode', 'otp_email']:
+        response = JsonResponse({'error': 'Throttle by expiry_date', 'expiry_date': expiry_date}, status=400)
+        # Keep cookie updated in case of manual removal to prevent 'counter' issues
+        OTPThrottle.set_cookie(request, response)
+        return response
+
+    # Set throttle OTP request (session)
+    if tred_expired and step in ['otp_qrcode', 'otp_email']:
+        OTPThrottle.set_session(request)
+
+    # Send OTP to user via specified step
     if step == 'otp_qrcode':
         email_otp_to_user(request.user)
     elif step == 'otp_email':
@@ -190,30 +223,40 @@ def requestOTPView(request, method):
     if request.method != 'POST':
         return HttpResponseBadRequest()
 
-    # Allow requests only from CORS_ALLOWED_ORIGINS
+    expiry_date = OTPThrottle.get(request, source='session')
+    send_otp_via = {'email': email_otp_to_user, 'sms': sms_otp_to_user}
     origin = request.headers.get('Origin') or request.headers.get('Referer')
+    user_id = request.user.id if request.user.is_authenticated else request.session.get('user_id')
+
+    # Allow requests only from CORS_ALLOWED_ORIGINS
     if not origin or not any(origin.startswith(o) for o in settings.CORS_ALLOWED_ORIGINS):
         return JsonResponse({'error': 'Unauthorized request'}, status=403)
-
+    # Return invalid method error
+    if method not in send_otp_via:
+        return JsonResponse({'error': 'Invalid method', 'method': method}, status=400)
     # Get User ID
-    user_id = request.user.id if request.user.is_authenticated else request.session.get('user_id')
     if not user_id:
-        return JsonResponse({'error': 'User not identified'}, status=400)
+        return JsonResponse({'error': 'User not identified', 'user_id': user_id}, status=400)
+    # Throttle OTP request (via session)
+    if not OTPThrottle.has_expired(request):
+        response = JsonResponse({'error': f'Throttle by expiry_date {expiry_date}', 'expiry_date': expiry_date}, status=400)
+        # Keep cookie updated in case of manual removal to prevent 'counter' issues
+        OTPThrottle.set_cookie(request, response)
+        return response
     
+
     # Send OTP to user via specified method: (email | sms)
     user_instance = get_object_or_404(User, id=user_id)
-    send_otp_via = {
-        'email': email_otp_to_user,
-        'sms': sms_otp_to_user
-    }
-    
-    if method in send_otp_via:
-        send_otp_via[method](user_instance)
-        return JsonResponse({'success': 'OTP Sent', 'method': method}, status=200)
+    send_otp_via[method](user_instance)
 
+    # Set throttle OTP request (session)
+    OTPThrottle.set_session(request)
 
-    # Return invalid method error
-    return JsonResponse({'error': 'Invalid method', 'method': method}, status=400)
+    # Generate response AND set throttle OTP request (cookie)
+    response = JsonResponse({'success': 'OTP Sent', 'method': method}, status=200)
+    OTPThrottle.set_cookie(request, response)
+
+    return response
  
 
 
@@ -223,38 +266,47 @@ def requestMFAModalView(request, modal):
     if request.method != 'POST':
         return HttpResponseBadRequest()
 
-    # Allow requests only from CORS_ALLOWED_ORIGINS
+    MODALS = ['otp_qrcode', 'otp_email', 'otp_sms']
+    expiry_date = OTPThrottle.get(request, source='session')
     origin = request.headers.get('Origin') or request.headers.get('Referer')
+    user_id = request.user.id if request.user.is_authenticated else request.session.get('user_id')
+
+    # Allow requests only from CORS_ALLOWED_ORIGINS
     if not origin or not any(origin.startswith(o) for o in settings.CORS_ALLOWED_ORIGINS):
         return JsonResponse({'error': 'Unauthorized request'}, status=403)
-    
     # Validate requested modal
-    MODALS = ['otp_qrcode', 'otp_email', 'otp_sms']
     if modal not in MODALS:
         return JsonResponse({'error': 'Invalid modal'}, status=400)
-
-
     # Get User ID
-    user_id = request.user.id if request.user.is_authenticated else request.session.get('user_id')
     if not user_id:
         return JsonResponse({'error': 'User not identified'}, status=400)
-
-    # Send OTP to user
-    user_instance = get_object_or_404(User, id=user_id)
-
-    if modal == 'otp_email':
-        email_otp_to_user(user_instance)
-    elif modal == 'otp_sms':
-        sms_otp_to_user(user_instance)
 
 
     # None ➡ <input value="None"> ➡ "None" (Type: String)
     next_url = request.POST.get('next')
     next_url = None if next_url in ['None', 'null', 'False'] else next_url
 
-    # Return the modal
+
+    tred_expired = OTPThrottle.has_expired(request)
+    user_instance = get_object_or_404(User, id=user_id)
+
+    # Throttle OTP request (via session)
+    # ELSE Send OTP to user (via specified modal)
+    if tred_expired:
+        if modal == 'otp_email':
+            email_otp_to_user(user_instance)
+        elif modal == 'otp_sms':
+            sms_otp_to_user(user_instance)
+
+    # Set throttle OTP request (session)
+    if tred_expired and modal != 'otp_qrcode':
+        OTPThrottle.set_session(request)
+
+
+    # Create the modal
     _reset_all_steps(request, MODALS)
-    return render(request, 'users/modals/profile/include.html', {
+    response = render(request, 'users/includes/modal.html', {
+        'path': 'mfa/',
         'title': 'Multi-Factor Authentication',
         'post_url': reverse('login'),
         'step': modal,
@@ -267,6 +319,13 @@ def requestMFAModalView(request, modal):
         'phone_number': request.POST.get('masked_phone_number'),
     })
 
+
+    # Set throttle OTP request (cookie)
+    if modal != 'otp_qrcode':
+        # Keep cookie updated in case of manual removal to prevent 'counter' issues
+        OTPThrottle.set_cookie(request, response)
+
+    return response
 
 
 
@@ -338,14 +397,18 @@ class CustomLoginView(LoginView):
         if not _validate_step(request, step, user):
             return JsonResponse({'error': _get_validation_error(step), 'step': step}, status=400)
 
-        # Reset used session data AND authenticate the user
+        # Reset used session & cookie data AND authenticate the user
         
         del self.request.session['next']
         del self.request.session['user_id']
         _reset_all_steps(request, self.STEPS)
+        OTPThrottle.remove_session(self.request)
 
-        login(request, user)
-        return self.success_redirect()
+        login(self.request, user)
+
+        response = self.success_redirect()
+        OTPThrottle.remove_cookie(response)
+        return response
 
 
 
@@ -363,7 +426,8 @@ class CustomLoginView(LoginView):
             request.session[f'verified_password'] = True
             request.session[f'next'] = request.GET.get('next')
 
-            return render(request, 'users/modals/profile/include.html', {
+            return render(request, 'users/includes/modal.html', {
+                'path': 'mfa/',
                 'title': 'Multi-Factor Authentication',
                 'post_url': reverse('login'),
                 'step': 'otp_qrcode',
@@ -375,9 +439,9 @@ class CustomLoginView(LoginView):
                 'email': mask_email(user.email),
                 'phone_number': mask_phone_number(str(user.account.phone_number)),
             })
-
+            
         else:
-            login(request, user)
+            login(self.request, user)
             return self.success_redirect()
 
 

@@ -1,0 +1,46 @@
+{% extends 'users/modals/base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+
+{% block body %}
+    <p id="{{ step|replace:'_|-' }}-instructions">Enter the one-time password (OTP) sent to your email: <br>
+        <strong>{% if email %}{{ email }}{% else %}{{ request.user.email }}{% endif %}</strong>
+    </p>
+    {% if submit == 'Login' %}
+        <hr>
+        <form id="mfa-alternative-options" class="d-flex justify-content-between align-items-center"
+            action="{% url 'request_mfa' 'none' %}"
+            enctype="multipart/form-data"
+            method="POST">
+            {% include 'users/modals/mfa/data/in_circulation.html' %}
+
+            <p class="w-50 me-2">Return back to try and login with your authentication app</p>
+            <button class="btn btn-outline-primary w-50" type="button"
+                hx-post="{% url 'request_mfa' 'otp_qrcode' %}"
+                hx-trigger="click throttle:1s"
+                hx-swap="none">
+                Authenticate<br>via app
+            </button>
+        </form>
+    {% endif %}
+    <hr>
+    {% url 'request_otp' 'email' as url_request_otp %}
+    {% include 'users/modals/components/resend_otp.html' with post_url=url_request_otp image_name='mail_to_laptop.png' image_path='users/img/mail_to_laptop.png' %}
+{% endblock %}
+
+
+{% if submit == 'Login' %}
+    {% block form %}
+        {% include 'users/modals/mfa/data/session_copy.html' %}
+    {% endblock %}
+{% endif %}
+
+
+{% block input %}
+    <span class="input-group-text">OTP</span>
+    <input name="otp_code" type="text" class="form-control" aria-label="one-time-password" aria-describedby="{{ step|replace:'_|-' }}-instructions" required
+        hx-post="{{ post_url }}"
+        hx-trigger="input changed delay:250ms"
+        hx-swap="none">
+{% endblock %}

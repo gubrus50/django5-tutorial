@@ -1,4 +1,4 @@
-{% extends 'users/modals/profile/base.html' %}
+{% extends 'users/modals/base.html' %}
 {% load custom_filters %}
 {% load static %}
 
@@ -38,7 +38,7 @@
                 <li>Locate the OTP for your account.</li>
                 <li>Enter the OTP in the verification field.</li>
             </ol>
-            {% include 'users/modals/profile/options.html' %}
+            {% include 'users/modals/components/mfa_options.html' %}
         </div>
     {% else %}
         <img class="w-75 border rounded-2" style="max-width: 300px;" src="{{ qrcode_data_uri }}" alt="Failed to load - QR Code">
@@ -50,7 +50,7 @@
 
 {% if submit == 'Login' %}
     {% block form %}
-        {% include 'users/modals/profile/data/session_copy.html' %}
+        {% include 'users/modals/mfa/data/session_copy.html' %}
     {% endblock %}
 {% endif %}
 

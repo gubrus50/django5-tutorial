@@ -232,7 +232,6 @@ def generate_otp_for_user(user_instance, interval=settings.OTP_DEFAULT_INTERVAL)
 
 
 def email_otp_to_user(user_instance):
-    return True
     """
     Generates a time-based one-time password (OTP) using the user's MFA secret and sends it via email.
 
@@ -265,7 +264,6 @@ def email_otp_to_user(user_instance):
 
 
 def sms_otp_to_user(user_instance):
-    return True
     """
     Generates a time-based one-time password (OTP) using the user's MFA secret and sends it via SMS.
 

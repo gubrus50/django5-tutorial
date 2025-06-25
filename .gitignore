@@ -16,3 +16,7 @@ project_folder/*.sqlite
 project_folder/*.sqlite3
 project_folder/*.db
 project_folder/*.db3
+
+
+# Ignore staticfiles
+project_folder/staticfiles/

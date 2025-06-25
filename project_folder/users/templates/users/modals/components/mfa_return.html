@@ -1,0 +1,14 @@
+<form id="mfa-alternative-options" class="d-flex justify-content-between align-items-center"
+    action="{% url 'request_mfa' 'none' %}"
+    enctype="multipart/form-data"
+    method="POST">
+    {% include 'users/modals/mfa/data/in_circulation.html' %}
+
+    <p class="w-50 me-2">Return back to try and login with your authentication app</p>
+    <button class="btn btn-outline-primary w-50" type="button"
+        hx-post="{% url 'request_mfa' 'otp_qrcode' %}"
+        hx-trigger="click throttle:1s"
+        hx-swap="none">
+        Authenticate<br>via app
+    </button>
+</form>

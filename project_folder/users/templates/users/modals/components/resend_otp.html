@@ -84,7 +84,6 @@
                     buttonTxt.classList.add('visually-hidden');
                 }, 500);
 
-
                 // Set fallback execution after 15 seconds
                 fallback = setTimeout(() => {
                     console.warn('No response received in 15 seconds, executing fallback.');
@@ -118,7 +117,7 @@
 
                 // Receive response from the backend
 
-                let xhr = event.detail.xhr;
+                let xhr = event.detail.xhr,
                     responseText = await xhr.responseText,
                     response = '';
 
@@ -134,12 +133,8 @@
 
                 // Handle response
 
-                if (response.success === 'OTP Sent') {
-                   setThrottle();
-                }
-                else if (response.error) {
-                    console.error(response.error);
-                }
+                if (response.success === 'OTP Sent') setThrottle();
+                else if (response.error) console.error(response.error);
 
             });
 

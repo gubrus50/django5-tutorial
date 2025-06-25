@@ -1,0 +1,15 @@
+{% load custom_filters %}
+
+<span class="input-group-text">{{ label }}</span>
+<input required
+
+name="{{ name }}"
+type="{% if name == 'password' %}password{% else %}text{% endif %}"
+class="form-control"
+
+aria-label="{{ aria_label }}"
+aria-describedby="{{ step|replace:'_|-' }}-instructions"
+
+hx-post="{{ post_url }}"
+hx-trigger="input changed delay:250ms"
+hx-swap="none">

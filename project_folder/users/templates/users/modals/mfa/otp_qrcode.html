@@ -56,9 +56,5 @@
 
 
 {% block input %}
-    <span class="input-group-text">OTP</span>
-    <input name="otp_code" type="text" class="form-control" aria-label="one-time-password" aria-describedby="{{ step|replace:'_|-' }}-instructions" required
-        hx-post="{{ post_url }}"
-        hx-trigger="input changed delay:250ms"
-        hx-swap="none">
+    {% include 'users/modals/components/main_input.html' with name='otp_code' label='OTP' aria_label='one-time-password' %}
 {% endblock %}

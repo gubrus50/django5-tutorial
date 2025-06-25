@@ -18,3 +18,7 @@ node_modules/
 *.sqlite3
 *.db
 *.db3
+
+
+# Ignore staticfiles
+staticfiles/

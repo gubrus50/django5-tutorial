@@ -21,7 +21,7 @@
 </div>
 {% endif %}
 
-<form method="post" enctype="multipart/form-data"
+<form method="POST" enctype="multipart/form-data"
   hx-post="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"
   hx-trigger="click throttle:1s"
   hx-swap="none">
@@ -51,5 +51,5 @@
 
 
 {% block base %}
-<script name="modals" src="{% static 'users/js/profile/modals.js' %}"></script>
+<script name="modal" src="{% static 'users/js/includes/modal.js' %}"></script>
 {% endblock %}

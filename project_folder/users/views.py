@@ -70,7 +70,7 @@ def enableMFAView(request):
                 request.user.account.save()
                 return JsonResponse({'success': 'Disabled MFA'}, status=200)
 
-        _reset_all_steps(request, STEPS)
+        _remove_all_steps(request, STEPS)
         return render(request, 'users/includes/modal.html', {
             'path': '',
             'title': 'Disable MFA',
@@ -88,7 +88,7 @@ def enableMFAView(request):
         not _all_steps_completed(request, STEPS)
         and request.session.get(f'verified_{STEPS[-1]}', False)
     ):
-        _reset_all_steps(request, STEPS)
+        _remove_all_steps(request, STEPS)
         # If valid step and IS NOT a first step
         if step in STEPS and step != STEPS[0]:
             messages.info(request, f'Restarted the session for Enable MFA')
@@ -112,7 +112,7 @@ def enableMFAView(request):
         request.user.account.mfa_enabled = True
         request.user.account.save()
         # Clear used session data
-        _reset_all_steps(request, STEPS)
+        _remove_all_steps(request, STEPS)
         OTPThrottle.remove_session(request)
         # Generate response AND clear used cookie data
         response = JsonResponse({'success': 'Enabled MFA', 'step': step}, status=200)
@@ -129,8 +129,8 @@ def enableMFAView(request):
 
 
 
-def _reset_all_steps(request, steps):
-    # Reset verification status by removing it from the session
+def _remove_all_steps(request, steps):
+    # Remove all verified steps from the session
     for step_name in steps:
         session_key = f'verified_{step_name}'
         if session_key in request.session:
@@ -192,19 +192,21 @@ def _get_validation_error(step):
 
 
 def _handle_post_validation(request, step):
+    STEPS = ['otp_qrcode', 'otp_email']
+
     # TRED = Throttle Request Expiry-Date
     tred_expired = OTPThrottle.has_expired(request)
     expiry_date = OTPThrottle.get(request, source='session')
 
     # Throttle OTP request (via session)
-    if not tred_expired and step in ['otp_qrcode', 'otp_email']:
+    if not tred_expired and step in STEPS:
         response = JsonResponse({'error': 'Throttle by expiry_date', 'expiry_date': expiry_date}, status=400)
         # Keep cookie updated in case of manual removal to prevent 'counter' issues
         OTPThrottle.set_cookie(request, response)
         return response
 
     # Set throttle OTP request (session)
-    if tred_expired and step in ['otp_qrcode', 'otp_email']:
+    if tred_expired and step in STEPS:
         OTPThrottle.set_session(request)
 
     # Send OTP to user via specified step
@@ -226,7 +228,6 @@ def requestOTPView(request, method):
     if request.method != 'POST':
         return HttpResponseBadRequest()
 
-    expiry_date = OTPThrottle.get(request, source='session')
     send_otp_via = {'email': email_otp_to_user, 'sms': sms_otp_to_user}
     origin = request.headers.get('Origin') or request.headers.get('Referer')
     user_id = request.user.id if request.user.is_authenticated else request.session.get('user_id')
@@ -242,7 +243,9 @@ def requestOTPView(request, method):
         return JsonResponse({'error': 'User not identified', 'user_id': user_id}, status=400)
     # Throttle OTP request (via session)
     if not OTPThrottle.has_expired(request):
-        response = JsonResponse({'error': f'Throttle by expiry_date {expiry_date}', 'expiry_date': expiry_date}, status=400)
+        response = JsonResponse({
+            'error': f'Throttle by expiry_date', 'expiry_date': OTPThrottle.get(request, source='session')
+        }, status=400)
         # Keep cookie updated in case of manual removal to prevent 'counter' issues
         OTPThrottle.set_cookie(request, response)
         return response
@@ -306,7 +309,7 @@ def requestMFAModalView(request, modal):
 
 
     # Create the modal
-    _reset_all_steps(request, MODALS)
+    _remove_all_steps(request, MODALS)
     response = render(request, 'users/includes/modal.html', {
         'path': 'mfa/',
         'title': 'Multi-Factor Authentication',
@@ -372,7 +375,7 @@ class CustomLoginView(LoginView):
 
     def multi_factor_auth(self, request, *args, **kwargs):
 
-        # Validate - "session" data
+        # Validate - session data: 'verified_password', 'user_id' and 'next'
 
         if request.session.get('verified_password') != True:
             return JsonResponse({'error': 'Unverified password'}, status=400)
@@ -406,7 +409,7 @@ class CustomLoginView(LoginView):
         
         del self.request.session['next']
         del self.request.session['user_id']
-        _reset_all_steps(request, self.STEPS)
+        _remove_all_steps(request, self.STEPS)
         OTPThrottle.remove_session(self.request)
 
         login(self.request, user)
@@ -426,7 +429,7 @@ class CustomLoginView(LoginView):
         if hasattr(user, 'account') and user.account.mfa_enabled:
             # Note: POST data (in circulation) includes some session data
             # These are used later to check if POST data matches the session
-            _reset_all_steps(request, self.STEPS)
+            _remove_all_steps(request, self.STEPS)
             request.session[f'user_id'] = user.id
             request.session[f'verified_password'] = True
             request.session[f'next'] = request.GET.get('next')

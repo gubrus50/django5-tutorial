@@ -7,7 +7,7 @@ sent from the backend are lost when a client requests an Email or SMS modal
 
 To mitigate this issue:
 
-- The relevant data is embedded within below specified <input> elements before sending the request.
+- The relevant data is embedded within below specified <input> tags before sending the request.
 - When requestMFAModalView() handles the request, it retrieves these values from the inputs.
 - The backend then returns the same data, ensuring it is available for template rendering of requested modals.
 

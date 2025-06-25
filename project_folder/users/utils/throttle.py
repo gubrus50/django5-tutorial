@@ -19,14 +19,14 @@ OTP_TRED_NAME = getattr(settings, 'OTP_TRED_NAME', 'otp_tred')
 # Note: 'seconds' are optional, default value is specified at settings.py
 #
 # - Set in SESSION
-# ThrottleOTPRequestExpiryDate.set(request, seconds=None)
+# ThrottleOTPRequestExpiryDate.set_session(request, seconds=None)
 #
 # -----------------------------------------------------------------------------
 #
 # Note: INHERITS expiry date FROM request session ELSE creates new_date()
 #
 # - Set in COOKIE
-# ThrottleOTPRequestExpiryDate.set(request, response, seconds=None)
+# ThrottleOTPRequestExpiryDate.set_cookie(request, response, seconds=None)
 #
 # -----------------------------------------------------------------------------
 #
@@ -174,7 +174,6 @@ class ThrottleOTPRequestExpiryDate:
     def remove_session(request):
         """
         Removes the OTP throttle expiry date from the session.
-        
         Args:
             request: The HTTP request object
         """
@@ -186,7 +185,6 @@ class ThrottleOTPRequestExpiryDate:
     def remove_cookie(response):
         """
         Removes the OTP throttle expiry date cookie from the response.
-        
         Args:
             response: The HTTP response object
         """

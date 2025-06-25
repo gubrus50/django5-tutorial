@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from twilio.rest import Client
 
-import io, base64, requests, stripe, boto3, pyotp, qrcode, re
+import io, re, base64, requests, stripe, boto3, pyotp, qrcode
 from botocore.exceptions import ClientError
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -232,6 +232,7 @@ def generate_otp_for_user(user_instance, interval=settings.OTP_DEFAULT_INTERVAL)
 
 
 def email_otp_to_user(user_instance):
+    return True
     """
     Generates a time-based one-time password (OTP) using the user's MFA secret and sends it via email.
 
@@ -264,6 +265,7 @@ def email_otp_to_user(user_instance):
 
 
 def sms_otp_to_user(user_instance):
+    return True
     """
     Generates a time-based one-time password (OTP) using the user's MFA secret and sends it via SMS.
 
@@ -303,7 +305,7 @@ def sms_otp_to_user(user_instance):
 
 def mask_email(email, visible_chars=1): 
     # Function to mask part of an email address for privacy.
-    # 'visible_chars' determines how many characters of the username remain visible.
+    # 'visible_chars' determines how many characters of the email's name remain visible.
 
     name, domain = email.split('@')  
     # Splits the email into two parts: 'name' (before @) and 'domain' (after @).

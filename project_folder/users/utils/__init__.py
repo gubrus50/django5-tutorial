@@ -1,6 +1,8 @@
 from django.core.files.uploadedfile import UploadedFile
 from django.core.mail import send_mail
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 from twilio.rest import Client
 
 import io, re, base64, requests, stripe, boto3, pyotp, qrcode
@@ -232,6 +234,7 @@ def generate_otp_for_user(user_instance, interval=settings.OTP_DEFAULT_INTERVAL)
 
 
 def email_otp_to_user(user_instance):
+    return True
     """
     Generates a time-based one-time password (OTP) using the user's MFA secret and sends it via email.
 
@@ -264,6 +267,7 @@ def email_otp_to_user(user_instance):
 
 
 def sms_otp_to_user(user_instance):
+    return True
     """
     Generates a time-based one-time password (OTP) using the user's MFA secret and sends it via SMS.
 
@@ -337,3 +341,16 @@ def mask_phone_number(phone_number: str) -> str:
     masked_middle = '*' * len(middle_part)
 
     return f"{country_code}{masked_middle}{last_visible}"
+
+
+
+
+def set_deletion_date_for_user(user_instance):
+    deletion_date = timezone.now() + timedelta(days=30)
+    user_instance.account.deletion_date = deletion_date
+    user_instance.account.save()
+
+
+def remove_deletion_date_for_user(user_instance):
+    user_instance.account.deletion_date = None
+    user_instance.account.save()

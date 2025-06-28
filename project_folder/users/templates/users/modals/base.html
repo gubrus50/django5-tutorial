@@ -5,7 +5,48 @@
             <div class="modal-header">
                 <h5 class="modal-title" id="{{ step|replace:'_|-' }}-label">{{ title }}</h5>
                 <span class="mx-auto text-secondary">{{ page }}</span>
-                <button type="button" class="btn-close" onclick="onAnyClosedModal('{{ submit }}')" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               
+                {# SERIALIZE on_delete_data #}
+
+                {% if on_delete_data %}
+                    {# creates <script> like seen in else statement #}
+                    {{ on_delete_data|json_script:'modals-on-delete-data' }}
+                {% else %}
+                    <script id="modals-on-delete-data" type="application/json">null</script>
+                {% endif %}
+
+                <script type="text/javascript">
+                    /* Declare the onAnyClosedModal on a global scope
+                    /
+                    /  if it hasn't been already to remove annoying
+                    /  error message: onAnyClosedModal is not defined
+                    / 
+                    /  This function is optional, it does not have to be declared
+                    */
+                    if (typeof window.onAnyClosedModal === 'undefined') {
+                        window.onAnyClosedModal = () => {};
+                    }
+
+                    (() => {
+                        const header = document.currentScript.parentElement;
+                        const closeBtn = header.querySelector('button.btn-close');
+
+                        const scriptTag = document.getElementById('modals-on-delete-data');
+                        let parsedData = null;
+
+                        try {
+                            parsedData = JSON.parse(scriptTag.textContent);
+                        } catch (error) {
+                            console.warn('modals/base.html - Failed to parse on_delete_data JSON', error);
+                        }
+
+                        closeBtn?.addEventListener("click", function () {
+                            onAnyClosedModal(parsedData);
+                        });
+                    })();
+                </script>
+                
             </div>
             <div class="modal-body">
                 {% block body %}{% endblock %}
@@ -20,7 +61,7 @@
                     {% block input %}{% endblock %}
                     <input type="hidden" name="step" value="{{ step }}">
                 </div>
-                <button type="submit" class="btn btn-{% if submit == 'Disable' %}danger{% else %}primary{% endif %} modal-submit-button w-100"
+                <button type="submit" class="btn btn-{% if submit_type %}{{ submit_type }}{% else %}primary{% endif %} modal-submit-button w-100"
                   hx-post="{{ post_url }}"
                   hx-trigger="click delay:1000ms"
                   hx-swap="none">

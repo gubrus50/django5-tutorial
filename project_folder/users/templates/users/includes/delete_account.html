@@ -1,0 +1,177 @@
+{% with delay='500' %} {# HX-TRIGGER and TIMEOUT delay in <script> #}
+
+
+
+{# NOTE: This <script> IS ADDED once AND WILL NOT be replaced #}
+
+<script name="loading-animation-for-buttons" type="text/javascript">
+
+const setLoadingButton = (button) => {
+    button.querySelector('.spinner-grow').classList.remove('visually-hidden');
+    button.querySelector('.button-text').innerText = 'loading...';
+}
+
+const setNormalButton = (button) => {
+    button.querySelector('.spinner-grow').classList.add('visually-hidden');
+    button.querySelector('.button-text').innerHTML = button.dataset.name;
+}
+
+</script>
+
+
+
+{# This is because only the hx-swap-oob content can be updated #}
+
+<form id="delete-account" class="d-flex flex-column gap-2 my-3"
+
+{% if request.user.account.deletion_date %}
+  hx-post="{% url 'delete_this_user' 'false' %}"
+{% else %}
+  hx-post="{% url 'delete_this_user' 'true' %}"
+{% endif %}
+
+hx-trigger="submit delay:{{ delay }}ms"
+hx-swap="none"
+hx-swap-oob="{% if swap_oob %}{{ swap_oob }}{% else %}none{% endif %}">
+
+    {% csrf_token %}
+
+
+    {# Hence, this <script> is always executed for every include #}
+
+    {% if hide_modals %}
+        <script type="text/javascript">
+            typeof hideModals === "function" && hideModals();
+            document.currentScript.remove();
+        </script>
+    {% endif %}
+
+
+    {% if request.user.account.deletion_date %}
+
+        {# Msg - Warning #}
+        <ul class="message bg-danger text-white py-2 mb-0">
+        <li class="fw-bold">
+            Your account and its associated data will be removed from our platform in
+            <span class="interval badge bg-warning text-dark">30 days</span>
+        </li>
+        <li>It may take a bit longer to remove your data from third-party services.</li>
+        </ul>
+
+        <hr>
+
+        {# Notes #}
+        <ul class="notes mb-4">
+        <li>We are obligated to delete your data within 30 - 90 days.</li>
+        <li>
+            You may
+            <span class="badge bg-secondary">STOP</span>
+            this process at any time within period of 
+            <span class="interval badge bg-danger">30 days</span>
+        </li>
+        </ul>
+
+        {# Btn - Stop Deletion #}
+        <button type="submit" class="btn btn-secondary w-100">
+            <span class="spinner-grow spinner-grow-sm visually-hidden" role="status" aria-hidden="true"></span>
+            <span class="button-text">STOP Account Deletion</span>
+        </button>
+
+    {% else %}
+
+        {# Msg - Info #}
+        <hr>
+        <ul class="message mb-4">
+        <li>Your account and its associated data will not be removed immediately.</li>
+        <li>We are obligated to delete your data within 30 - 90 days.</li>
+        <li>
+            You may stop this process at any time within
+            <span class="interval badge bg-secondary">30 days</span>
+        </li>
+        <br>
+        <li>
+            Review our
+            <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+            for details on how we handle your data.
+        </li>
+        </ul>
+
+        {# Btn - Delete #}
+        <button type="submit" class="btn btn-danger w-100">
+            <span class="spinner-grow spinner-grow-sm visually-hidden" role="status" aria-hidden="true"></span>
+            <span class="button-text">Delete My Account</span>
+        </button>
+
+    {% endif %}
+
+
+    <script type="text/javascript">
+        (() => {
+
+            const form = document.getElementById('delete-account');
+            let button = form.querySelector('button[type="submit"]'),
+                throttle = false;
+
+            button.dataset.name = button.innerHTML.trim();
+
+
+            // Set loading animation for button, when pressed 
+
+            button.addEventListener('click', () =>
+            {
+                if (throttle) return;
+                throttle = true;
+
+                timeout = setTimeout(() => {
+                    setLoadingButton(button);
+                }, {{ delay }});
+
+                // Set fallback execution after 15 seconds
+                fallback = setTimeout(() => {
+                    console.warn('No response received in 15 seconds, executing fallback.');
+                    setNormalButton(button);
+                    throttle = false;
+                }, 15000);
+
+                setLoadingButton(button);
+            });
+
+
+
+            // Clear animation once response is provided from the server
+            //
+            // NOTE: No duplicate HTMX event listeners will persist.
+            // The parent <form> holds the listener and is replaced via hx-swap-oob (outerHTML),
+            // which naturally removes the previous DOM and its associated listeners.
+            // 
+            form.addEventListener('htmx:afterRequest', async (event) => {
+
+                let form = event.detail.target.closest('form');
+                if (form?.id != 'delete-account') return;
+
+                // Receive response from the backend
+
+                let xhr = event.detail.xhr,
+                    responseText = await xhr.responseText;
+
+                if (!xhr.getResponseHeader('Content-Type')?.includes('text/html')) return;
+
+                // Handle response
+                
+                clearTimeout(timeout);
+                clearTimeout(fallback);
+                setNormalButton(button);
+                throttle = false;
+
+            });
+
+
+
+            document.currentScript.remove();
+
+        })();
+    </script>
+
+
+</form>
+{% endwith %}

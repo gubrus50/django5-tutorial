@@ -24,6 +24,8 @@ from .utils import (
     sms_otp_to_user,
     mask_email,
     mask_phone_number,
+    set_deletion_date_for_user,
+    remove_deletion_date_for_user,
 )
 
 import stripe, pyotp
@@ -71,14 +73,21 @@ def enableMFAView(request):
                 return JsonResponse({'success': 'Disabled MFA'}, status=200)
 
         _remove_all_steps(request, STEPS)
-        return render(request, 'users/includes/modal.html', {
+        context = {
             'path': '',
             'title': 'Disable MFA',
             'post_url': reverse('enable_mfa'),
             'step': 'password',
             'submit': 'Disable',
+            'submit_type': 'danger',
             'submit_boldend': 'Multi-Factor Authentication',
-        })
+        }
+        context['on_delete_data'] = {
+            'step': context['step'],
+            'title': context['title'],
+            'submit': context['submit'],
+        }
+        return render(request, 'users/includes/modal.html', context)
 
     # --- Show initial modal TO start verifying steps TO Enable MFA ---
 
@@ -147,6 +156,11 @@ def _render_step_modal(request, step, all_steps, base_context):
         'page': f'{all_steps.index(step) + 1}/{len(all_steps)}',
         'submit': 'Enable' if is_last_step else 'Proceed to the next step',
         'submit_boldend': 'Multi-Factor Authentication' if is_last_step else '',
+    }
+    context['on_delete_data'] = {
+        'step': context['step'],
+        'title': context['title'],
+        'submit': context['submit'],
     }
     if step == 'otp_qrcode':
         context['qrcode_data_uri'] = get_users_mfa_secret_as_qrcode_base64(request.user)
@@ -335,6 +349,47 @@ def requestMFAModalView(request, modal):
 
     return response
 
+
+
+
+@login_required
+def deleteUserView(request, delete):
+    if request.method != 'POST':
+        return HttpResponseBadRequest()
+
+    # Converts any value to boolean, only 'true' & '1' become True
+    delete = delete.lower() in ['true', '1']
+    step = request.POST.get('step')
+
+    # UNSET deletion date FOR this logged-in User
+    
+    if not step and delete == False:
+        remove_deletion_date_for_user(request.user)
+        context = {'swap_oob': 'outerHTML', 'hide_modals': True}
+        return render(request, 'users/includes/delete_account.html', context)
+
+    # Validate password (ELSE return error) THEN
+    # SET deletion date FOR this logged-in User
+
+    elif step == 'password' and delete == True:
+        if not _validate_step(request, step):
+            return JsonResponse({'error': _get_validation_error(step), 'step': step}, status=400)
+
+        set_deletion_date_for_user(request.user)
+        context = {'swap_oob': 'outerHTML', 'hide_modals': True}
+        return render(request, 'users/includes/delete_account.html', context)
+
+    # Return password modal
+
+    return render(request, 'users/includes/modal.html', {
+        'path': '',
+        'title': 'Delete My Account',
+        'post_url': reverse('delete_this_user', kwargs={'delete': delete}),
+        'step': 'password',
+        'submit': 'Approve',
+        'submit_type': 'danger',
+        'submit_boldend': 'Deletion of My Account',
+    })
 
 
 

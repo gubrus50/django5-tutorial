@@ -56,6 +56,7 @@ class Account(models.Model):
     is_active = models.BooleanField(default=True)
     is_suspended = models.BooleanField(default=False)
     suspension_end = models.DateTimeField(blank=True, null=True)
+    deletion_date = models.DateTimeField(blank=True, null=True)
 
     # Security
     has_verified_email = models.BooleanField(default=False)

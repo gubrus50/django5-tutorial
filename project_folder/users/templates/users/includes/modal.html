@@ -2,7 +2,7 @@
     {% with model_path='users/modals/'|add:path|add:step|add:'.html' %}
         {% if next %}
             {% with post_url=post_url|add:'?next='|add:next %}
-                {% include model_path with title=title post_url=post_url step=step page=page submit=submit submit_boldend=submit_boldend %}
+                {% include model_path with title=title post_url=post_url step=step page=page submit=submit submit_type=submit_type submit_boldend=submit_boldend %}
             {% endwith %}
         {% else %}
             {% include model_path with title=title post_url=post_url step=step page=page submit=submit submit_boldend=submit_boldend %}
@@ -41,12 +41,17 @@
                 setLoadingButtonForModal(btnSubmit);
             });
             
-            // Remove faded background element: .modal-backgrop
-            //
-            // Note: Bootstrap Models remove .modal-backgrop by themselves on modal_instance.hide() call.
-            // However, the Bootstrap Modal is replaced too quickly for its eventListener to clear the faded element.
-            //
+            /* Remove faded background element: .modal-backgrop & added styles
+            /
+            /  Note: Models remove .modal-backgrop & hidden overflow + padding
+            /  By themselves on modal_instance.hide() call.
+            /
+            /  However, the Bootstrap Modal is replaced too quickly
+            /  By HTMX for its eventListener to remove these additions.
+            */
             document.querySelectorAll('.modal-backdrop')?.forEach(backdrop => backdrop.remove());
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
 
             modal.show();
             document.currentScript.remove();

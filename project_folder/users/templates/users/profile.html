@@ -40,15 +40,16 @@
                         </div>
                         <hr>
                         {{ forms.user|crispy }}
-                        <div class="row justify-content-between">
+                        <div class="row justify-content-between mb-4">
                             <div class="col-auto">
                                 <button class="btn btn-warning" type="submit">Update Profile</button>
                             </div>
                             <div class="col-auto">
-                                <a href="{% url 'password_reset' %}" class="btn btn-link">change password</a>
+                                <a href="{% url 'password_reset' %}" class="btn btn-link pe-0">change password</a>
                             </div>
                         </div>
                     </form>
+                    {% include 'users/includes/delete_account.html' %}
 
                 {% else %}
 
@@ -96,7 +97,18 @@ function throttleElement(element, type='click', delay=500) {
 
 
 const input_enable_mfa = document.getElementById('mfa-flex-switch');
-const onAnyClosedModal = submit => input_enable_mfa.checked = submit == 'Disable';
+
+const onAnyClosedModal = (modalData) => {
+    if (!modalData) return;
+
+    const { step, submit, title } = modalData;
+
+    if (title == 'Enable MFA'
+    ||  title == 'Disable MFA')
+    {
+        input_enable_mfa.checked = submit == 'Disable'; 
+    }
+}
 
 throttleElement(input_enable_mfa, 'click', parseInt(
     input_enable_mfa.getAttribute('hx-trigger')

@@ -11,5 +11,5 @@ aria-label="{{ aria_label }}"
 aria-describedby="{{ step|replace:'_|-' }}-instructions"
 
 hx-post="{{ post_url }}"
-hx-trigger="input changed delay:250ms"
+hx-trigger="{% if name == 'password' %}submit throttle{% else %}input changed delay{% endif %}:250ms"
 hx-swap="none">

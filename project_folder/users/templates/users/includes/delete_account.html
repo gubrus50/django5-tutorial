@@ -1,9 +1,15 @@
-{% with delay='500' %} {# HX-TRIGGER and TIMEOUT delay in <script> #}
+{% load static %}
+
+{# NOTE: delay = HX-TRIGGER and TIMEOUT delay in <script> #}
+{# NOTE: LDI = Period in which user's data should be removed #}
+
+{% with delay='500' legal_deletion_interval='30 - 90 days' %}
 
 
 
-{# NOTE: This <script> IS ADDED once AND WILL NOT be replaced #}
-
+{# NOTE: These scripts are added once on entering the profile.html template #}
+<script name="count-down" src="{% static 'users/js/includes/count_down.js' %}"></script>
+{# NOTE: This <script> contains copy functions of modals.js at users/static #}
 <script name="loading-animation-for-buttons" type="text/javascript">
 
 const setLoadingButton = (button) => {
@@ -20,7 +26,8 @@ const setNormalButton = (button) => {
 
 
 
-{# This is because only the hx-swap-oob content can be updated #}
+
+{# NOTE: hx-swap-oob content is updated for every HTMX request TO deleteUserView() #}
 
 <form id="delete-account" class="d-flex flex-column gap-2 my-3"
 
@@ -37,11 +44,11 @@ hx-swap-oob="{% if swap_oob %}{{ swap_oob }}{% else %}none{% endif %}">
     {% csrf_token %}
 
 
-    {# Hence, this <script> is always executed for every include #}
+    {# Hence, this <script> is always updated for every submit of this <form> #}
 
     {% if hide_modals %}
-        <script type="text/javascript">
-            typeof hideModals === "function" && hideModals();
+        <script type="text/javascript">            
+            typeof hideModals === 'function' && hideModals();
             document.currentScript.remove();
         </script>
     {% endif %}
@@ -49,26 +56,33 @@ hx-swap-oob="{% if swap_oob %}{{ swap_oob }}{% else %}none{% endif %}">
 
     {% if request.user.account.deletion_date %}
 
+        <details>
+            <summary>Technical Details</summary>
+            <span class="badge bg-danger">DELETE {{ request.user.username }}</span>
+            <span class="badge bg-warning text-dark">ID {{ request.user.id }}</span>
+            <span class="badge bg-secondary">DUI {{ DELETE_USER_INTERVAL }}</span>
+            <span class="badge bg-light text-dark">Date {{ deletion_date }}</span>
+        </details>
+
         {# Msg - Warning #}
         <ul class="message bg-danger text-white py-2 mb-0">
-        <li class="fw-bold">
-            Your account and its associated data will be removed from our platform in
-            <span class="interval badge bg-warning text-dark">30 days</span>
-        </li>
-        <li>It may take a bit longer to remove your data from third-party services.</li>
+            <li class="fw-bold">
+                Your account and its associated data will be removed from our platform in
+                <span class="interval badge bg-warning text-dark">--</span>
+            </li>
+            <li>It may take a bit longer to remove your data from third-party services.</li>
         </ul>
 
         <hr>
 
         {# Notes #}
         <ul class="notes mb-4">
-        <li>We are obligated to delete your data within 30 - 90 days.</li>
-        <li>
-            You may
-            <span class="badge bg-secondary">STOP</span>
-            this process at any time within period of 
-            <span class="interval badge bg-danger">30 days</span>
-        </li>
+            <li>We are obligated to delete your data within {{ legal_deletion_interval }}.</li>
+            <li>
+                You may 
+                <span class="badge bg-secondary">STOP</span>
+                <strong>this process</strong> by hitting the below button.
+            </li>
         </ul>
 
         {# Btn - Stop Deletion #}
@@ -77,24 +91,46 @@ hx-swap-oob="{% if swap_oob %}{{ swap_oob }}{% else %}none{% endif %}">
             <span class="button-text">STOP Account Deletion</span>
         </button>
 
+        <script type="text/javascript">
+            // Can't use constant NOR let because declared data updates per <form> submit
+            // NOTE: Date() requires ISO 8601 format to include UTC dilation (timezone)
+            countDown.date = new Date("{{ deletion_date }}")
+            countDown.elements = [...document.querySelectorAll('span.interval')];
+            document.currentScript.remove();
+        </script>
+
     {% else %}
 
         {# Msg - Info #}
         <hr>
         <ul class="message mb-4">
-        <li>Your account and its associated data will not be removed immediately.</li>
-        <li>We are obligated to delete your data within 30 - 90 days.</li>
-        <li>
-            You may stop this process at any time within
-            <span class="interval badge bg-secondary">30 days</span>
-        </li>
-        <br>
-        <li>
-            Review our
-            <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
-            for details on how we handle your data.
-        </li>
+            <li>Your account and its associated data will not be removed immediately.</li>
+            <li>We are obligated to delete your data within {{ legal_deletion_interval }}.</li>
+            <li>
+                You may stop this process at any time within
+                <span class="interval badge bg-secondary">--</span>
+            </li>
+            <br>
+            <li>
+                Review our
+                <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+                for details on how we handle your data.
+            </li>
         </ul>
+
+        <script type="text/javascript">
+            (() => {
+                const script = document.currentScript;
+                const parent = script.parentElement;
+
+                const elements = [parent.querySelector('.interval')];
+                const date = getFutureDate({{ DELETE_USER_INTERVAL }});
+                      date.setSeconds(date.getSeconds() + 1);
+
+                formatCountdownElements({ elements, date });
+                document.currentScript.remove();
+            })();
+        </script>
 
         {# Btn - Delete #}
         <button type="submit" class="btn btn-danger w-100">
@@ -138,12 +174,12 @@ hx-swap-oob="{% if swap_oob %}{{ swap_oob }}{% else %}none{% endif %}">
 
 
 
-            // Clear animation once response is provided from the server
-            //
-            // NOTE: No duplicate HTMX event listeners will persist.
-            // The parent <form> holds the listener and is replaced via hx-swap-oob (outerHTML),
-            // which naturally removes the previous DOM and its associated listeners.
-            // 
+            /* Clear animation once response is provided from the server
+            /
+            /  NOTE: No duplicate HTMX event listeners will persist.
+            /  The parent <form> holds the listener and is replaced via hx-swap-oob (outerHTML),
+            /  which naturally removes the previous DOM and its associated listeners.
+            */ 
             form.addEventListener('htmx:afterRequest', async (event) => {
 
                 let form = event.detail.target.closest('form');

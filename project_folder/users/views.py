@@ -357,15 +357,22 @@ def deleteUserView(request, delete):
     if request.method != 'POST':
         return HttpResponseBadRequest()
 
+
     # Converts any value to boolean, only 'true' & '1' become True
     delete = delete.lower() in ['true', '1']
     step = request.POST.get('step')
+
+    context = {
+        'DELETE_USER_INTERVAL': settings.DELETE_USER_INTERVAL,
+        'swap_oob': 'outerHTML',
+        'hide_modals': True,
+    }
+
 
     # UNSET deletion date FOR this logged-in User
     
     if not step and delete == False:
         remove_deletion_date_for_user(request.user)
-        context = {'swap_oob': 'outerHTML', 'hide_modals': True}
         return render(request, 'users/includes/delete_account.html', context)
 
     # Validate password (ELSE return error) THEN
@@ -376,8 +383,10 @@ def deleteUserView(request, delete):
             return JsonResponse({'error': _get_validation_error(step), 'step': step}, status=400)
 
         set_deletion_date_for_user(request.user)
-        context = {'swap_oob': 'outerHTML', 'hide_modals': True}
+        # Include deletion_date in ISO 8601 format
+        context['deletion_date'] = request.user.account.deletion_date.isoformat()
         return render(request, 'users/includes/delete_account.html', context)
+
 
     # Return password modal
 
@@ -389,6 +398,7 @@ def deleteUserView(request, delete):
         'submit': 'Approve',
         'submit_type': 'danger',
         'submit_boldend': 'Deletion of My Account',
+        'DELETE_USER_INTERVAL': context['DELETE_USER_INTERVAL'],
     })
 
 
@@ -619,7 +629,13 @@ def profileView(request, user_id):
             'user': form_user,
             'profile': form_profile,
             'account': form_account
-        }
+        },
+        'DELETE_USER_INTERVAL': settings.DELETE_USER_INTERVAL,
     }
+
+    # Include deletion_date in ISO 8601 format
+    deletion_date = request.user.account.deletion_date
+    if deletion_date:
+        context['deletion_date'] = deletion_date.isoformat()
 
     return render(request, 'users/profile.html', context)

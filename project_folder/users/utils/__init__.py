@@ -346,9 +346,17 @@ def mask_phone_number(phone_number: str) -> str:
 
 
 def set_deletion_date_for_user(user_instance):
-    deletion_date = timezone.now() + timedelta(days=30)
+    current_date = timezone.localtime()
+
+    deletion_date = current_date + timedelta(
+        days=settings.DELETE_USER_INTERVAL
+    )
+    # Note: deletion_date is timezone-aware and saved in UTC
+    # The datetime value remains the same
     user_instance.account.deletion_date = deletion_date
     user_instance.account.save()
+
+
 
 
 def remove_deletion_date_for_user(user_instance):

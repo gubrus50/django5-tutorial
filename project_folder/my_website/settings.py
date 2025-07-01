@@ -282,9 +282,17 @@ OTP_EMAIL_INTERVAL = 180  # 3 minutes
 OTP_SMS_INTERVAL = 180    # 3 minutes
 
 
-
 # Twilio API keys
 
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
+
+
+# Users app settings
+
+# Note: User is permanently removed after the interval.
+# Hence, do not set this setting to 0. It's better to
+# give user some time in case they change their mind
+
+DELETE_USER_INTERVAL = 1 # N of days

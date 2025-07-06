@@ -23,7 +23,9 @@ const countDown = {
 
 /**
  * Returns a Date object representing a future point in time based on the number of days from now.
- * Supports fractional day values (e.g., 0.5 for 12 hours).
+ * 
+ * Supports fractional day values
+ * (example: 0.5 days FOR 12 hours, NOTE: day = 24 hours)
  *
  * @param {number} days - The number of days (can be fractional) to add to the current time.
  * @returns {Date} A new Date object representing the computed future date and time.
@@ -93,16 +95,16 @@ const formatCountdownElements = ({ elements, date } = {}) => {
             const d = formatValueWithPlural(fullDaysRemaining, 'day');
 
             if (fullDaysRemaining >= 1) {
-                // Take away a day(s) from 'h' IF possible, ELSE → false
+                // Take away day(s) FROM 'h' IF possible, ELSE → false
                 // Then format: N hour(s), IF hours is NOT false, ELSE → ''
                 let hours = (h.value - 24 * d.value) || false;
-                    hours = hours ? `${hours} ${hours === 1 ? 'hour' : 'hours'}` : ''
+                    hours = hours ? `${hours} ${hours === 1 ? 'hour' : 'hours'}` : '';
 
-                // ≥1 day left → "N day(s) N hour(s)" (Time left)
+                // ≥1 day left → "N day(s) N hour(s)" , (Time left)
                 element.textContent = `${d.value} ${d.noun} ${hours}`;
             }
             else {
-                // <1 day left → "N hour(s) N minute(s) N second(s)" (Time left)
+                // <1 day left → "N hour(s) N minute(s) N second(s)" , (Time left)
                 element.textContent = `${h.value} ${h.noun} ${m.value} ${m.noun} ${s.value} ${s.noun}`;
             }
         }

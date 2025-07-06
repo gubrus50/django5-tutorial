@@ -2,6 +2,10 @@ from django.utils import timezone
 from datetime import date, datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+# Note: time.py utilities are not being used, hence it can be removed
+
+# For more details,
+# Check commit: https://github.com/gubrus50/django5-tutorial/commit/5c2ec7f0361412a40c8097b87b4c9967fc6b81db
 
 
 

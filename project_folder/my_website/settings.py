@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     # Top priority apps
     'daphne',
     'whitenoise.runserver_nostatic',
+
     # Build-in apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     # Libraries
     'django_htmx',
     'storages',
@@ -69,6 +71,8 @@ INSTALLED_APPS = [
     'django_sass',
     'django_resized',
     'django_recaptcha',
+    'django_celery_beat',
+
     # Django apps
     'app_name.apps.AppNameConfig',
     'users.apps.UsersConfig',
@@ -295,4 +299,115 @@ TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
 # Hence, do not set this setting to 0. It's better to
 # give user some time in case they change their mind
 
-DELETE_USER_INTERVAL = 1 # N of days
+DELETE_USER_INTERVAL = 30 # N of days
+
+
+# Celery - Docs: https://docs.celeryq.dev/en/stable/django/index.html
+
+# NOTE: Please remove the below statement once
+# Valkey is officially supported by Celery:
+
+""" As of 07/Jul/2025:
+
+
+  According to "madolson" a Valkey maintainer, at github.com
+  (source: https://github.com/celery/celery/issues/9092)
+
+  Valkey is intended to be API compatible with Redis 7.2.X
+  However, this is not guaranteed for future versions.
+
+
+  -----------------------------------------------------
+
+
+  Valkey has already diverged in one way or another, and it
+  still preserves interest due to its open-source license.
+
+  Valkey is said to be developed independently from Redis
+  in future releases >=8.X.X possibly becoming more diverse. 
+  
+  Hence, there is a possibility of Valkey being formally
+  supported by the celery library for its unique advantage.
+
+
+  -----------------------------------------------------
+
+  Note:
+
+  - Celery uses Kombu to manage messaging transports.
+  - Kombu supports transports like: redis, amqp, django, etc
+  - Valkey, while compatible with Redis, isn't registered as a transport name.
+
+
+  Therefore,
+
+  IF SET: valkey://localhost:6379/0
+  ERROR : KeyError: 'No such transport: valkey'
+    - This means that valkey is not a valid Kombu transport.
+
+  IF SET: redis://localhost:6379/0
+  ERROR : AttributeError 'NoneType' object has no attribute 'Redis'
+    - This means that redis is not installed.
+
+
+  django-valkey library, registered in installed apps
+  recommends the use of valkey instead of redis.
+
+  Unfortunately, doing so fires previously mentioned
+  error due to Kombu libraries lack of transport support for Valkey
+
+  This is an ongoing open-issue for the celery library: 
+  https://github.com/celery/kombu/issues/2245
+
+ 
+  -----------------------------------------------------
+
+  Note:
+
+  Kombu library has switched from Redis to Valkey.
+  And the team has not experienced transport related issues
+  when setting up a bloker via Valkey + Celery.
+
+  According to Zerotask, at github.com
+  (source: https://github.com/celery/kombu/pull/2246)
+
+  The team worked on the issue, and updated plus approved
+  new changes on the 1st of Jun 2025 for 5.7.0 release.
+
+
+  -----------------------------------------------------
+
+
+  The official installed version when installing Valkey
+  via pip, was set to kombu==5.5.4 as stated in the requirements.txt
+
+  Hence, the error when:
+    CELERY_BROKER_URL = 'valkey://localhost:6379/0'
+
+  Try updating to version - kombu==5.7.0 if possible
+  (
+    It's not available in pip library yet
+    For that reason, you have to use redis for now until
+    Valkey is fully supported
+  )
+  
+
+  -----------------------------------------------------
+
+  TEMPORARY SOLUTION:
+
+  I have decided to install redis (pip install redis)
+  and included it in the requirements.txt
+
+  I also decided to use: 'redis://localhost:6379/0'
+  due to lack of Valkey transport.
+
+  Once, valkey is supported by celery, you should
+  update the CELERY_BROKER_URL and requirements.txt
+  if installed redis library is not being utilized.
+
+"""
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'

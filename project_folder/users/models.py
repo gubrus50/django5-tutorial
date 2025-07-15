@@ -51,16 +51,11 @@ class Account(models.Model):
 
     # Contact
     phone_number = PhoneNumberField(unique=True, null=True)
-    
-    # State
+
+    # Activity
     is_active = models.BooleanField(default=True)
     is_suspended = models.BooleanField(default=False)
     suspension_end = models.DateTimeField(blank=True, null=True)
-    deletion_date = models.DateTimeField(blank=True, null=True)
-    # Note: CharField is used because Celery task IDs are strings (UUIDs)
-    deletion_task_id = models.CharField(max_length=255,  blank=True, null=True, editable=False,
-        help_text="Celery task ID for the deletion process"
-    )
 
     # Security
     has_verified_email = models.BooleanField(default=False)
@@ -72,13 +67,23 @@ class Account(models.Model):
     stripe_customer_id = models.CharField(max_length=255, blank=True, null=True, unique=True, editable=False)
     stripe_last_intent_id = models.CharField(max_length=255, blank=True, null=True, unique=True, editable=False)
 
-
+    # Removal
+    DELETION_PHASES = (
+        ('pending', 'Pending Deletion'),
+        ('stripe_started', 'Stripe Deletion Started'),
+        ('stripe_completed', 'Stripe Deletion Completed'),
+        ('user_deletable', 'User Ready for Deletion'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    )
+    deletion_date = models.DateTimeField(blank=True, null=True)
+    deletion_phase = models.CharField(max_length=20, choices=DELETION_PHASES, default='pending')
 
     # Note: Property allows to call below method without: ()
     # e.g.: account_instance.is_deletion_scheduled -> True / False
     @property
     def is_deletion_scheduled(self):
-        return bool(self.deletion_task_id)
+        return bool(self.deletion_date)
 
 
 

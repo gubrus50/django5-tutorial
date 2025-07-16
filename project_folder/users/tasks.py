@@ -6,7 +6,6 @@ from users.models import Account
 
 from datetime import timedelta
 from celery import shared_task, chain
-from celery.result import AsyncResult
 
 import logging, stripe
 
@@ -197,12 +196,7 @@ def process_stuck_user_deletions_task(batch_size=100):
     removed and their associated data on third party services,
     by finalizing the unfinished deletion processes.
     """
-
-    processed = {
-        'users': 0,
-        'zombie_accounts': 0,
-        'stripe_customers': 0,
-    }
+    processed = { 'users': 0, 'zombie_accounts': 0, 'stripe_customers': 0, }
 
 
     # 1. Renew interrupted Stripe deletions (1h+ stale)
@@ -213,7 +207,7 @@ def process_stuck_user_deletions_task(batch_size=100):
     #   - Been stuck for >1 hour (deletion_date check)
     #
     # Prevents Orphans:
-    #   Without this, accounts could remain indefinitely in a half-deleted state
+    # Without this, accounts could remain indefinitely in a half-deleted state
     #
     stripe_interrupted = Account.objects.filter(
         deletion_phase='stripe_started',

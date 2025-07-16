@@ -73,8 +73,8 @@ class Account(models.Model):
         ('stripe_started', 'Stripe Deletion Started'),
         ('stripe_completed', 'Stripe Deletion Completed'),
         ('user_deletable', 'User Ready for Deletion'),
-        ('completed', 'Completed'),
-        ('failed', 'Failed'),
+        ('completed', 'User has been Deleted'),
+        ('failed', 'Failed to fully Delete the User'),
     )
     deletion_date = models.DateTimeField(blank=True, null=True)
     deletion_phase = models.CharField(max_length=20, choices=DELETION_PHASES, default='pending')

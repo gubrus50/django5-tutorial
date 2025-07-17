@@ -493,6 +493,10 @@ class CustomLoginView(LoginView):
         user = form.get_user()
         request = self.request
 
+        # Redirect, already logged-in user
+        if user == request.user and request.user.is_authenticated:
+            return self.success_redirect()
+
         if hasattr(user, 'account') and user.account.mfa_enabled:
             # Note: POST data (in circulation) includes some session data
             # These are used later to check if POST data matches the session

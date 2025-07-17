@@ -45,7 +45,7 @@
 {% endif %}
 
 
-<form id="main-form" method="POST" enctype="multipart/form-data"
+<form method="POST" enctype="multipart/form-data"
 {% if not registry %}
 
   hx-post="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}"

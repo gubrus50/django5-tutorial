@@ -22,10 +22,7 @@
 
 <table>
   <tr>
-    <td width="50%"><strong>Add new model</strong></td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
+    <td rowspan="2" valign="top">
       <br>
       To register a new model, the user must be logged in and click the “Add Model” link on the main page. They will be redirected to a form to create the model. Upon successful submission, they are returned to the main page and can delete their models at any time from there.
       <hr>
@@ -37,11 +34,15 @@
         <li>Country code</li>
       </ul>
       Depending on the selected filter, an additional input field may appear. For example, selecting “Creator ID” prompts the user to provide the corresponding ID.
-      <hr>
-      Models are loaded in batches of five per request via infinite scroll. Relevant models matching the search criteria are displayed first. As users scroll further, additional—possibly irrelevant—models will appear beneath the initial results.
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/models.webp"></td>
+  </tr>
+  <tr>
+    <td>
+      Models are loaded in batches of five per request via infinite scroll. Relevant models matching the search criteria are displayed first. As users scroll further, additional—possibly irrelevant—models will appear beneath the initial results.
+      <br>
+    </td>
   </tr>
 </table>
 
@@ -83,7 +84,7 @@
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/deleteUserSetting.webp"></td>
   </tr>
   <tr>
-     <td>
+    <td>
       Account deletions are handled by a background scheduler running on a separate server. Eligible accounts are processed every 15 minutes. A secondary fallback scheduler ensures full deletion in case of interruptions or failure in the primary task.
       <hr>
       ⚠️ Once an account is deleted, it cannot be recovered—including any third-party integrations such as the associated Stripe customer account used for payments.

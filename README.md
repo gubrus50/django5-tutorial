@@ -2,25 +2,6 @@
 
 <table>
   <tr>
-    <td width="50%"><strong>Enable Multi-Factor Authentication</strong></td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <br>
-      To activate multi-factor authentication (MFA), ensure your profile includes a current mobile number and email address.
-      <hr>
-      Verification codes will be sent to both, and must be validated before MFA can be enabled.
-      <hr>
-      Users can disable MFA at any time from their profile page. Since this is a critical security setting, they will be prompted to confirm their password as a safeguard.
-      <br>
-    </td>
-    <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/enableMFA.webp"></td>
-  </tr>
-</table>
-
-
-<table>
-  <tr>
     <td width="50%"><strong>Login Examples</strong></td>
   </tr>
   <tr>
@@ -38,7 +19,6 @@
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/loginView.webp"></td>
   </tr>
 </table>
-
 
 <table>
   <tr>
@@ -62,5 +42,23 @@
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/models.webp"></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="50%"><strong>Enable Multi-Factor Authentication</strong></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <br>
+      To activate multi-factor authentication (MFA), ensure your profile includes a current mobile number and email address.
+      <hr>
+      Verification codes will be sent to both, and must be validated before MFA can be enabled.
+      <hr>
+      Users can disable MFA at any time from their profile page. Since this is a critical security setting, they will be prompted to confirm their password as a safeguard.
+      <br>
+    </td>
+    <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/enableMFA.webp"></td>
   </tr>
 </table>

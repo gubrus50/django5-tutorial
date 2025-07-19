@@ -62,3 +62,32 @@
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/enableMFA.webp"></td>
   </tr>
 </table>
+
+<table>
+  <tr>
+    <td rowspan="2" valign="top">
+      <br>
+      Users can remove their account at any time from the profile page. Because this is a critical action, password confirmation is required to proceed.
+      <hr>
+      <p>Upon successful verification, a feedback panel appears displaying:</p>
+      <ul>
+        <li>A countdown indicating when the account is scheduled for deletion</li>
+        <li>Optional technical reassessment details, accessible via a dropdown</li>
+        <li>Key instructions outlining what users should know before and after the deletion is finalized</li>
+        <li>Links to the site's privacy policy and terms & conditions for reference</li>
+      </ul>
+      <hr>
+      Users may cancel the deletion schedule at any point before the countdown completes—no password verification required. Canceling the schedule resets the countdown; if reinitiated, a fresh 30-day deletion interval begins.
+      <br>
+    </td>
+    <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/deleteUserSetting.webp"></td>
+  </tr>
+  <tr>
+     <td>
+      Account deletions are handled by a background scheduler running on a separate server. Eligible accounts are processed every 15 minutes. A secondary fallback scheduler ensures full deletion in case of interruptions or failure in the primary task.
+      <hr>
+      ⚠️ Once an account is deleted, it cannot be recovered—including any third-party integrations such as the associated Stripe customer account used for payments.
+      <br>
+    </td>
+  </tr>
+</table>

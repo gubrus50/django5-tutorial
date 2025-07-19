@@ -17,12 +17,10 @@
   </tr>
   <tr>
     <td width="50%">
-      <ul>
-        <li>Logged-in users may revisit the login page to sign in as a different user; doing so will log out the current session.</li>
-        <li>For accounts with MFA enabled, an OTP must be provided via authenticator app, email, or SMS.</li>
-        <li>To prevent spamming, additional OTP requests are throttled with a 45-second cooldown.</li>
-        <li>If required input fields from the MFA modal form are tampered with before submission (e.g. via HTML manipulation), a technical error will be displayed.</li>
-      </ul>
+        Logged-in users may revisit the login page to sign in as a different user; doing so will log out the current session.
+        <hr>For accounts with MFA enabled, an OTP must be provided via authenticator app, email, or SMS.
+        <hr>To prevent spamming, additional OTP requests are throttled with a 45-second cooldown.
+        <hr>If required input fields from the MFA modal form are tampered with before submission (e.g. via HTML manipulation), a technical error will be displayed.
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/loginView.webp"></td>
   </tr>

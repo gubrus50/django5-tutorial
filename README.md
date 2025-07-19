@@ -1,9 +1,7 @@
 # How to use the app
 
+## Login User
 <table>
-  <tr>
-    <td width="50%"><strong>Login Examples</strong></td>
-  </tr>
   <tr>
     <td width="50%" valign="top">
       <br>
@@ -20,6 +18,7 @@
   </tr>
 </table>
 
+## Add modals
 <table>
   <tr>
     <td rowspan="2" valign="top">
@@ -46,10 +45,8 @@
   </tr>
 </table>
 
+## Enable Multi-Factor Authentication
 <table>
-  <tr>
-    <td width="50%"><strong>Enable Multi-Factor Authentication</strong></td>
-  </tr>
   <tr>
     <td width="50%" valign="top">
       <br>
@@ -64,6 +61,7 @@
   </tr>
 </table>
 
+## Remove User
 <table>
   <tr>
     <td rowspan="2" valign="top">

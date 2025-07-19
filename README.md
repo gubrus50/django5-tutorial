@@ -1,11 +1,17 @@
-# django5-tutorial
+# How to use the app
 
 <table>
   <tr>
     <td width="50%"><strong>Enable Multi-Factor Authentication</strong></td>
   </tr>
   <tr>
-    <td width="50%">To activate multi-factor authentication (MFA), ensure your profile includes a current mobile number and email address. Verification codes will be sent to both, and must be validated before MFA can be enabled.</td>
+    <td width="50%" valign="top">
+      <br>
+      To activate multi-factor authentication (MFA), ensure your profile includes a current mobile number and email address.
+      <hr>
+      Verification codes will be sent to both, and must be validated before MFA can be enabled.
+      <br>
+    </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/enableMFA.webp"></td>
   </tr>
 </table>
@@ -16,7 +22,8 @@
     <td width="50%"><strong>Login examples</strong></td>
   </tr>
   <tr>
-    <td width="50%">
+    <td width="50%" valign="top">
+      <br>
       Logged-in users may revisit the login page to sign in as a different user; doing so will log out the current session.
       <hr>
       For accounts with MFA enabled, an OTP must be provided via authenticator app, email, or SMS.

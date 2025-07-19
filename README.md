@@ -19,7 +19,7 @@
 
 <table>
   <tr>
-    <td width="50%"><strong>Login examples</strong></td>
+    <td width="50%"><strong>Login Examples</strong></td>
   </tr>
   <tr>
     <td width="50%" valign="top">
@@ -34,5 +34,31 @@
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/loginView.webp"></td>
+  </tr>
+</table>
+
+
+<table>
+  <tr>
+    <td width="50%"><strong>Add new model</strong></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <br>
+      To register a new model, the user must be logged in and click the “Add Model” link on the main page. They will be redirected to a form to create the model. Upon successful submission, they are returned to the main page and can delete their models at any time from there.
+      <hr>
+      <p>Users can search for models using the search input. Search results may include their own models as well as those created by other users. Available filters include:</p>
+      <ul>
+        <li>No creator</li>
+        <li>Creator username</li>
+        <li>Creator ID</li>
+        <li>Country code</li>
+      </ul>
+      Depending on the selected filter, an additional input field may appear. For example, selecting “Creator ID” prompts the user to provide the corresponding ID.
+      <hr>
+      Models are loaded in batches of five per request via infinite scroll. Relevant models matching the search criteria are displayed first. As users scroll further, additional—possibly irrelevant—models will appear beneath the initial results.
+      <br>
+    </td>
+    <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/models.webp"></td>
   </tr>
 </table>

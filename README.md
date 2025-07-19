@@ -18,7 +18,7 @@
   </tr>
 </table>
 
-## Add modals
+## Models
 <table>
   <tr>
     <td rowspan="2" valign="top">

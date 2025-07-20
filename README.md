@@ -1,4 +1,4 @@
-# How to use the app
+# Key Features
 
 ## Login User
 <table>
@@ -86,6 +86,33 @@
       Account deletions are handled by a background scheduler running on a separate server. Eligible accounts are processed every 15 minutes. A secondary fallback scheduler ensures full deletion in case of interruptions or failure in the primary task.
       <hr>
       ⚠️ Once an account is deleted, it cannot be recovered—including any third-party integrations such as the associated Stripe customer account used for payments.
+      <br>
+    </td>
+  </tr>
+</table>
+
+## Chat Rooms
+<table>
+  <tr>
+    <td rowspan="2" valign="top">
+      <br>
+      The platform supports real-time conversations using ASGI and WebSockets.
+      <hr>
+      <p>To start a direct chat, users can visit another user's profile and click the "Message" button located below their profile picture.</p>
+      <ul>
+        <li>If a chatroom already exists between the two users, the logged-in user is redirected there.</li>
+        <li>If not, a new direct chatroom is created automatically.</li>
+      </ul>
+      <hr>
+      Users can revisit their active conversations anytime via the "My Chats" dropdown on their own profile page.
+      <hr>
+      A public chatroom also exists, but it’s not currently linked on any page. To access it manually, navigate to: <code>localhost:8000/chat/</code><br>
+    </td>
+    <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/chatRooms.webp"></td>
+  </tr>
+  <tr>
+    <td>
+      ⚠️ Conversations are not end-to-end encrypted. Messages can be viewed via the admin panel and should not be considered private. 🗑️ Chat histories associated with deleted users are automatically removed from the system.
       <br>
     </td>
   </tr>

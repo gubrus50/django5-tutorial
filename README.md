@@ -131,3 +131,14 @@
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/payments.webp"></td>
   </tr>
 </table>
+
+## Errors
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <br>
+      <br>
+    </td>
+    <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/errors.webp"></td>
+  </tr>
+</table>

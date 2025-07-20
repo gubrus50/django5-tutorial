@@ -211,6 +211,33 @@
   <tr>
     <td width="50%" valign="top">
       <br>
+      <ul>
+        <li>
+          <strong>400 Bad Request</strong><br>
+          The server couldn’t understand the request due to malformed syntax. 
+          <em>Example:</em> Submitting a form with missing or invalid fields, or a malformed JSON payload.
+        </li>
+        <br>
+        <li>
+          <strong>403 Forbidden</strong><br>
+          The server understood the request but refuses to authorize it. 
+          <em>Example:</em> Accessing a restricted admin page without proper credentials.
+        </li>
+        <br>
+        <li>
+          <strong>404 Not Found</strong><br>
+          The requested resource couldn’t be found.<br>
+          <em>Example:</em> A mistyped URL, or visiting a deleted page.
+        </li>
+        <br>
+        <li>
+          <strong>500 Internal Server Error</strong><br>
+          A generic error indicating something went wrong on the server side. 
+          <em>Example:</em> Unhandled exception, misconfigured middleware, or a broken database query.
+        </li>
+      </ul>
+      <hr>
+      <p>⚠️ These error pages are shown only when <code>DEBUG = False</code> in your <code>settings.py</code>. When <code>DEBUG = True</code>, Django displays detailed debug pages instead, which are useful during development for diagnosing issues</p>
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/errors.webp"></td>

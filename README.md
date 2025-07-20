@@ -137,11 +137,33 @@
 ## Payments
 <table>
   <tr>
-    <td width="50%" valign="top">
+    <td rowspan="2" valign="top">
       <br>
+      <p>There are two payment flows available via Stripe: <strong>Buy Plan</strong> and <strong>Donate</strong>. Both are accessible only to authenticated users via direct URLs:</p>
+      <ul>
+        <li><strong>Buy Plan:</strong> <code>localhost:8000/buy-plan</code></li>
+        <li><strong>Donate:</strong> <code>localhost:8000/donate</code></li>
+      </ul>
+      <hr>
+      <p><strong>Buy Plan</strong> - Users select from predefined plans via a dropdown. Backend validation enforces the selection, ensuring secure, tamper-proof payments. Each user is tied to a Stripe customer ID. If absent, a new account is auto-generated when accessing the page—even if a prior account was unlinked.</p>
+      <hr>
+      <p><strong>Donate</strong> - This page allows users to enter a custom donation amount. Key features include:</p>
+      <ul>
+        <li>Polish-language support for all labels and error messages</li>
+        <li>Localized country selector with flags for enhanced UX</li>
+        <li>Address input with country-aware postcode validation</li>
+        <li>Postcode patterns and available countries configurable via JSON</li>
+        <li>Country exclusions enforced (e.g. Russia, North Korea)</li>
+      </ul>
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/payments.webp"></td>
+  </tr>
+  <tr>
+    <td>
+      Upon payment completion, users are greeted with a confirmation screen and may redirect themselves back to the homepage.
+      <br>
+    </td>
   </tr>
 </table>
 

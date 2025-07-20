@@ -1,4 +1,18 @@
-<strong>Disclaimer - this project is still a work in progress</strong>
+# Purpose
+
+The goal of this project is to support learning of the Django framework, with a primary focus on backend development. Along the way, it incorporates a variety of external services to meet different functional requirements. While the app is fundamentally backend-driven, certain advanced features—such as multi-factor authentication (MFA), donation payments, and user account deletion—introduce significant frontend complexity. As such, a solid understanding of JavaScript is recommended before exploring these sections.
+
+## Disclaimer
+
+I am still a learner myself. Throughout development, I encountered and had to adopt many unfamiliar methodologies, which may have introduced occasional mistakes or inconsistencies in the documentation. Nevertheless, the process has been incredibly educational, and I hope others will find value in the experience and insights shared.
+
+## Documentation
+
+To get started, simply download <code>Django.pdf</code> and follow the instructions inside.<br>
+<strong>Pro tip</strong>: I recommend opening the file in two-page view on a separate monitor for easier navigation.
+
+<br>
+<br>
 
 # Key Features
 

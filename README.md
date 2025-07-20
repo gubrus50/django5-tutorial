@@ -23,7 +23,7 @@
   <tr>
     <td rowspan="2" valign="top">
       <br>
-      To register a new model, the user must be logged in and click the “Add Model” link on the main page. They will be redirected to a form to create the model. Upon successful submission, they are returned to the main page and can delete their models at any time from there.
+      To register a new model, the user must be logged in and click the <code>Add Model</code> link on the main page. They will be redirected to a form to create the model. Upon successful submission, they are returned to the main page and can delete their models at any time from there.
       <hr>
       <p>Users can search for models using the search input. Search results may include their own models as well as those created by other users. Available filters include:</p>
       <ul>

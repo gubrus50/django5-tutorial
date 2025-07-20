@@ -20,7 +20,6 @@
   </tr>
   <tr>
     <td valign="top">
-      <br>
       ⚠️ A user's contact details—such as their phone number and email address—are masked using asterisk symbols <code>*</code> during MFA logging to provide minimal feedback and protect personal data.
       <br>
     </td>

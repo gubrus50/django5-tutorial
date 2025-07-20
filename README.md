@@ -146,7 +146,7 @@
       Users can revisit their active conversations anytime via the <code>My Chats</code> dropdown on their own profile page.
       <hr>
       <p>A public chatroom also exists, but it’s not currently linked on any page. To access it manually, navigate to: <code>localhost:8000/chat/</code></p>
-      <p>The same goes for accessing other users, just use: <code>localhost:8000/users/profile/ID_NUMBER></code></p>
+      <p>The same goes for accessing other users, just use: <code>localhost:8000/users/profile/USER_ID</code></p>
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/chatRooms.webp"></td>

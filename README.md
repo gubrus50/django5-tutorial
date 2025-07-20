@@ -98,13 +98,13 @@
       <br>
       The platform supports real-time conversations using ASGI and WebSockets.
       <hr>
-      <p>To start a direct chat, users can visit another user's profile and click the "Message" button located below their profile picture.</p>
+      <p>To start a direct chat, users can visit another user's profile and click the <code>Message</code> button located below their profile picture.</p>
       <ul>
         <li>If a chatroom already exists between the two users, the logged-in user is redirected there.</li>
         <li>If not, a new direct chatroom is created automatically.</li>
       </ul>
       <hr>
-      Users can revisit their active conversations anytime via the <br>"My Chats" dropdown on their own profile page.
+      Users can revisit their active conversations anytime via the <code>My Chats</code> dropdown on their own profile page.
       <hr>
       A public chatroom also exists, but it’s not currently linked on any page. To access it manually, navigate to: <code>localhost:8000/chat/</code><br>
     </td>

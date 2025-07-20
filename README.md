@@ -45,7 +45,7 @@
   </tr>
 </table>
 
-## Enable Multi-Factor Authentication
+## Multi-Factor Authentication
 <table>
   <tr>
     <td width="50%" valign="top">

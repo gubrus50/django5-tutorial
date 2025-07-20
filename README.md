@@ -2,6 +2,8 @@
 
 # Key Features
 
+<br>
+
 ## Login User
 <table>
   <tr>
@@ -26,6 +28,8 @@
   </tr>
 </table>
 
+<br>
+
 ## Register User
 <table>
   <tr>
@@ -36,6 +40,8 @@
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/registerUserView.png"></td>
   </tr>
 </table>
+
+<br>
 
 ## Models
 <table>
@@ -67,6 +73,8 @@
   </tr>
 </table>
 
+<br>
+
 ## Multi-Factor Authentication
 <table>
   <tr>
@@ -84,6 +92,8 @@
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/enableMFA.webp"></td>
   </tr>
 </table>
+
+<br>
 
 ## Remove User
 <table>
@@ -116,6 +126,8 @@
   </tr>
 </table>
 
+<br>
+
 ## Chat Rooms
 <table>
   <tr>
@@ -144,6 +156,8 @@
     </td>
   </tr>
 </table>
+
+<br>
 
 ## Payments
 <table>
@@ -184,6 +198,8 @@
   </tr>
 </table>
 
+<br>
+
 ## Errors
 <table>
   <tr>
@@ -194,6 +210,8 @@
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/errors.webp"></td>
   </tr>
 </table>
+
+<br>
 
 ## Contact Support Team
 <table>

@@ -213,13 +213,29 @@
 
 <br>
 
-## Contact Support Team
+## Contacting Support
 <table>
   <tr>
-    <td width="50%" valign="top">
+    <td rowspan="2" valign="top">
       <br>
+      All users — whether logged in or not — can reach the support team via the direct URL: <code>http://localhost:8000/contact</code>.
+      <hr>
+      <p>To streamline communication, the form includes:</p>
+      <ul>
+        <li>📝 A pre-formatted message template</li>
+        <li>🗂️ A selection of subject options to help route inquiries efficiently</li>
+        <li>📧 A required client email field so our support team can follow up with a response</li>
+      </ul>
+      <hr>
+      The contact form is protected by reCAPTCHA to block spam and automated abuse. Submissions are sent via a bot email connected to Zoho Mail, and repeated spam can trigger account suspension. That’s why keeping this protection in place is essential.
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/contactFormView.png"></td>
+  </tr>
+  <tr>
+    <td valign="top">
+      ⚠️ The page is not currently linked in the UI and must be accessed manually.
+      <br>
+    </td>
   </tr>
 </table>

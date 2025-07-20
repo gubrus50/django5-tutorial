@@ -161,7 +161,7 @@
   </tr>
   <tr>
     <td>
-      Upon payment completion, users are greeted with a confirmation screen and may redirect themselves back to the homepage.
+      ✅ Upon payment completion, users are greeted with a confirmation screen and may redirect themselves back to the homepage.
       <br>
     </td>
   </tr>

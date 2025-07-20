@@ -23,8 +23,16 @@ To get started, simply download <code>Django.pdf</code> and follow the instructi
 
 # Key Features
 
-[Login User](##login-user)
-
+1. [Login User](#login-user)<br>
+2. [Register User](#register-user)<br>
+3. [Models](#models)<br>
+4. [Multi-Factor Authentication](#multi-factor-authentication)<br>
+5. [Remove User](#remove-user)<br>
+6. [Chat Rooms](#chat-rooms)<br>
+7. [Payments](#payments)<br>
+8. [Errors](#errors)<br>
+9. [Contacting Support](#contacting-support)<br>
+10. (...a work in progress, monitor tasks with flower + celery)
 
 <br>
 

@@ -104,7 +104,7 @@
         <li>If not, a new direct chatroom is created automatically.</li>
       </ul>
       <hr>
-      Users can revisit their active conversations anytime via the "My Chats" dropdown on their own profile page.
+      Users can revisit their active conversations anytime via the <br>"My Chats" dropdown on their own profile page.
       <hr>
       A public chatroom also exists, but it’s not currently linked on any page. To access it manually, navigate to: <code>localhost:8000/chat/</code><br>
     </td>

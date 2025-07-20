@@ -18,6 +18,17 @@
   </tr>
 </table>
 
+## Register User
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <br>
+      <br>
+    </td>
+    <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/registerUserView.png"></td>
+  </tr>
+</table>
+
 ## Models
 <table>
   <tr>
@@ -140,5 +151,16 @@
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/errors.webp"></td>
+  </tr>
+</table>
+
+## Contact
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <br>
+      <br>
+    </td>
+    <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/contactFormView.png"></td>
   </tr>
 </table>

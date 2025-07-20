@@ -162,7 +162,6 @@
         <li>Postcode patterns and available countries configurable via JSON</li>
         <li>Country exclusions enforced (e.g. Russia, North Korea)</li>
       </ul>
-      <br>
       <p>Although the example image shows a full address line, this feature is disabled in the current live implementation. Developers can manually re-enable it as needed.</p>
       <br>
     </td>

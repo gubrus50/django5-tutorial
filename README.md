@@ -5,7 +5,7 @@
 ## Login User
 <table>
   <tr>
-    <td width="50%" valign="top">
+    <td rowspan="2" valign="top">
       <br>
       Logged-in users may revisit the login page to sign in as a different user; doing so will log out the current session.
       <hr>
@@ -17,6 +17,13 @@
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/loginView.webp"></td>
+  </tr>
+  <tr>
+    <td valign="top">
+      <br>
+      ⚠️ A user's contact details—such as their phone number and email address—are masked using asterisk symbols <code>*</code> during MFA logging to provide minimal feedback and protect personal data.
+      <br>
+    </td>
   </tr>
 </table>
 

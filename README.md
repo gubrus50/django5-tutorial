@@ -139,15 +139,17 @@
   <tr>
     <td rowspan="2" valign="top">
       <br>
-      <p>There are two payment flows available via Stripe: <strong>Buy Plan</strong> and <strong>Donate</strong>. Both are accessible only to authenticated users via direct URLs:</p>
+      <p>There are two payment flows available via Stripe: <strong>Buy Plan</strong> and <strong>Donate</strong>. Both are accessible only to authenticated users:</p>
       <ul>
         <li><strong>Buy Plan:</strong> <code>localhost:8000/buy-plan</code></li>
         <li><strong>Donate:</strong> <code>localhost:8000/donate</code></li>
       </ul>
       <hr>
-      <p><strong>Buy Plan</strong> - Users select from predefined plans via a dropdown. Backend validation enforces the selection, ensuring secure, tamper-proof payments. Each user is tied to a Stripe customer ID. If absent, a new account is auto-generated when accessing the page—even if a prior account was unlinked.</p>
+      <h4>Buy Plan</h4>
+      <p>Users select from predefined plans via a dropdown. Backend validation enforces the selection, ensuring secure, tamper-proof payments.</p>
       <hr>
-      <p><strong>Donate</strong> - This page allows users to enter a custom donation amount. Key features include:</p>
+      <h4>Donate</h4>
+      <p>This page allows users to enter a custom donation amount. Key features include:</p>
       <ul>
         <li>Polish-language support for all labels and error messages</li>
         <li>Localized country selector with flags for enhanced UX</li>
@@ -161,7 +163,10 @@
   </tr>
   <tr>
     <td>
+      <br>
       ✅ Upon payment completion, users are greeted with a confirmation screen and may redirect themselves back to the homepage.
+      <hr>
+      <p><strong>NOTE</strong>: Each user is tied to a Stripe customer ID. If absent, a new account is auto-generated when accessing the page—even if a prior account was unlinked.</p>
       <br>
     </td>
   </tr>

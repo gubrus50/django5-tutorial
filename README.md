@@ -247,7 +247,8 @@
   </tr>
   <tr>
     <td>
-      <p>⚠️ These error pages are shown only when <code>DEBUG = False</code> in your <code>settings.py</code>. When <code>DEBUG = True</code>, Django displays detailed debug pages instead, which are useful during development for diagnosing issues</p>
+      <br>
+      ⚠️ These error pages are shown only when <code>DEBUG = False</code> in your <code>settings.py</code>. When <code>DEBUG = True</code>, Django displays detailed debug pages instead, which are useful during development for diagnosing issues.
       <br>
     </td>
   </tr>

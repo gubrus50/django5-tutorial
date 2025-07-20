@@ -6,10 +6,17 @@ The goal of this project is to support learning of the Django framework, with a 
 
 I am still a learner myself. Throughout development, I encountered and had to adopt many unfamiliar methodologies, which may have introduced occasional mistakes or inconsistencies in the documentation. Nevertheless, the process has been incredibly educational, and I hope others will find value in the experience and insights shared.
 
-## Documentation
+## Documentation & Project
 
-To get started, simply download <code>Django.pdf</code> and follow the instructions inside.<br>
-<strong>Pro tip</strong>: I recommend opening the file in two-page view on a separate monitor for easier navigation.
+To get started, simply download <code>Django.pdf</code> and follow the instructions inside.
+
+<strong>NOTE</strong>:
+<ul>
+  <li>I recommend opening the file in two-page view on a separate monitor for easier navigation.</li>
+  <li>This project was mainly developed and tested in a Linux-based environment: RedHat family - Fedora.</li>
+  <li>This project is built using the latest stable release of Django and up-to-date pip packages as of July 2025. All dependencies have been actively maintained to ensure compatibility, security, and modern development practices.</li>
+  <li>This project makes extensive use of Bootstrap 5 components, which—while widely supported—may no longer be the preferred choice for building modern, scalable applications, especially given the recent shift in popularity toward Tailwind CSS. Nonetheless, I discovered several useful packages that simplified development and complemented Bootstrap's design system. They also helped streamline the documentation by saving visual and layout space, making the learning process more approachable.</li>
+</ul>
 
 <br>
 <br>

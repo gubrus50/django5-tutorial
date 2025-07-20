@@ -32,6 +32,7 @@
         <li>Creator ID</li>
         <li>Country code</li>
       </ul>
+      <hr>
       Depending on the selected filter, an additional input field may appear. For example, selecting “Creator ID” prompts the user to provide the corresponding ID.
       <br>
     </td>

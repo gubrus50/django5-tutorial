@@ -1,3 +1,5 @@
+<strong>Disclaimer - this project is still a work in progress</strong>
+
 # Key Features
 
 ## Login User

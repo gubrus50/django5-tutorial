@@ -120,3 +120,14 @@
     </td>
   </tr>
 </table>
+
+## Payments
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <br>
+      <br>
+    </td>
+    <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/payments.webp"></td>
+  </tr>
+</table>

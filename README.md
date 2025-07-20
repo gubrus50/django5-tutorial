@@ -71,6 +71,8 @@
       Verification codes will be sent to both, and must be validated before MFA can be enabled.
       <hr>
       Users can disable MFA at any time from their profile page. Since this is a critical security setting, they will be prompted to confirm their password as a safeguard.
+      <hr>
+      ⚠️ MFA is currently enforced via <code>CustomLoginView()</code> only. Django’s default admin login bypasses this mechanism. To maintain consistent authentication security, consider routing admin login through the custom view—or disabling access to the admin panel "login" site entirely.
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/enableMFA.webp"></td>

@@ -35,6 +35,11 @@
   <tr>
     <td width="50%" valign="top">
       <br>
+      Visiting clients can register new users and optionally set a profile image during registration. Once registered, users are authenticated automatically and redirected to the main page. From their profile page, they can update their photo, password, and other account details at any time. If no image is provided, a default template image is automatically assigned.
+      <hr>
+      To handle media storage efficiently, the application integrates with Amazon S3 buckets. This setup ensures profile pictures are stored securely and reliably, leveraging AWS's globally distributed, scalable infrastructure. Offloading image management to S3 also simplifies server logic and improves performance across deployments.
+      <hr>
+      Users can delete their account anytime from the profile page, giving them full control over their data and online presence.
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/registerUserView.png"></td>

@@ -100,7 +100,8 @@
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/deleteUserSetting.webp"></td>
   </tr>
   <tr>
-    <td>
+    <td valign="top">
+      <br>
       Account deletions are handled by a background scheduler running on a separate server. Eligible accounts are processed every 15 minutes. A secondary fallback scheduler ensures full deletion in case of interruptions or failure in the primary task.
       <hr>
       ⚠️ Once an account is deleted, it cannot be recovered—including any third-party integrations such as the associated Stripe customer account used for payments.
@@ -168,7 +169,8 @@
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/payments.webp"></td>
   </tr>
   <tr>
-    <td>
+    <td valign="top">
+      <br>
       ✅ Upon payment completion, users are greeted with a confirmation screen and may redirect themselves back to the homepage.
       <hr>
       ⚠️ Each user is tied to a Stripe customer ID. If absent, a new account is auto-generated when accessing the page—even if a prior account was unlinked.

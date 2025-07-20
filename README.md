@@ -158,6 +158,8 @@
         <li>Country exclusions enforced (e.g. Russia, North Korea)</li>
       </ul>
       <br>
+      <p>Although the example image shows a full address line, this feature is disabled in the current live implementation. Developers can manually re-enable it as needed.</p>
+      <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/payments.webp"></td>
   </tr>

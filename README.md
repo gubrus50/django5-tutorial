@@ -47,6 +47,8 @@
       </ul>
       <hr>
       Depending on the selected filter, an additional input field may appear. For example, selecting “Creator ID” prompts the user to provide the corresponding ID.
+      <hr>
+      Model creation is gated behind a reCAPTCHA challenge to prevent spam and abusive requests. This safeguard helps protect the integrity and performance of the application's services.
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/models.webp"></td>

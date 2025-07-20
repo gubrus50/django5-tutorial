@@ -156,7 +156,7 @@
   </tr>
 </table>
 
-## Contact Support
+## Contact Support Team
 <table>
   <tr>
     <td width="50%" valign="top">

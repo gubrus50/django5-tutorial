@@ -214,7 +214,7 @@
 ## Errors
 <table>
   <tr>
-    <td width="50%" valign="top">
+    <td rowspan="2" valign="top">
       <br>
       <ul>
         <li>
@@ -241,11 +241,15 @@
           <em>Example:</em> Unhandled exception, misconfigured middleware, or a broken database query.
         </li>
       </ul>
-      <hr>
-      <p>⚠️ These error pages are shown only when <code>DEBUG = False</code> in your <code>settings.py</code>. When <code>DEBUG = True</code>, Django displays detailed debug pages instead, which are useful during development for diagnosing issues</p>
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/errors.webp"></td>
+  </tr>
+  <tr>
+    <td>
+      <p>⚠️ These error pages are shown only when <code>DEBUG = False</code> in your <code>settings.py</code>. When <code>DEBUG = True</code>, Django displays detailed debug pages instead, which are useful during development for diagnosing issues</p>
+      <br>
+    </td>
   </tr>
 </table>
 

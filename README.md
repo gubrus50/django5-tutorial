@@ -78,7 +78,7 @@
 ## Multi-Factor Authentication
 <table>
   <tr>
-    <td width="50%" valign="top">
+    <td rowspan="2" valign="top">
       <br>
       To activate multi-factor authentication (MFA), ensure your profile includes a current mobile number and email address.
       <hr>
@@ -87,11 +87,15 @@
       Users can disable MFA at any time from their profile page. Since this is a critical security setting, they will be prompted to confirm their password as a safeguard.
       <hr>
       ⚠️ MFA is currently enforced via <code>CustomLoginView()</code> only. Django’s default admin login bypasses this mechanism. To maintain consistent authentication security, consider routing admin login through the custom view—or disabling access to the admin panel "login" site entirely.
-      <hr>
-      ⚠️ This application utilizes Zoho and Twilio services to send One-Time Password (OTP) codes.
       <br>
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/animated/enableMFA.webp"></td>
+  </tr>
+  <tr>
+    <td>
+      ⚠️ This application utilizes Zoho and Twilio services to send One-Time Password (OTP) codes.
+      <br>
+    </td>
   </tr>
 </table>
 

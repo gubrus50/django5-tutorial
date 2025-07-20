@@ -166,7 +166,7 @@
       <br>
       ✅ Upon payment completion, users are greeted with a confirmation screen and may redirect themselves back to the homepage.
       <hr>
-      <p><strong>NOTE</strong>: Each user is tied to a Stripe customer ID. If absent, a new account is auto-generated when accessing the page—even if a prior account was unlinked.</p>
+      ⚠️ Each user is tied to a Stripe customer ID. If absent, a new account is auto-generated when accessing the page—even if a prior account was unlinked.
       <br>
     </td>
   </tr>

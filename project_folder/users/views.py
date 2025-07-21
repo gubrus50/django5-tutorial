@@ -501,9 +501,9 @@ class CustomLoginView(LoginView):
             # Note: POST data (in circulation) includes some session data
             # These are used later to check if POST data matches the session
             _remove_all_steps(request, self.STEPS)
-            request.session[f'user_id'] = user.id
-            request.session[f'verified_password'] = True
-            request.session[f'next'] = request.GET.get('next')
+            request.session['user_id'] = user.id
+            request.session['verified_password'] = True
+            request.session['next'] = request.GET.get('next')
 
             return render(request, 'users/includes/modal.html', {
                 'path': 'mfa/',

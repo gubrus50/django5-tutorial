@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'django_resized',
     'django_recaptcha',
     'django_celery_beat',
+    'django_celery_results',
 
     # Django apps
     'app_name.apps.AppNameConfig',
@@ -410,4 +411,5 @@ DELETE_USER_INTERVAL = 30 # N of days
 
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_RESULT_EXTENDED = True

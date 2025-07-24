@@ -1,6 +1,6 @@
 # Purpose
 
-The goal of this project is to support learning of the Django framework, with a primary focus on backend development. Along the way, it incorporates a variety of external services to meet different functional requirements. While the app is fundamentally backend-driven, certain advanced features—such as multi-factor authentication (MFA), donation payments, and user account deletion—introduce significant frontend complexity. As such, a solid understanding of JavaScript is recommended before exploring these sections: [JavaScript Intermediate](https://1drv.ms/b/c/a8ea73639e1a076a/ETnwCT76VaxLvtN9ZxOtkNQB5X5aoPzHePCMs88QNS6Z9Q?e=XNWNiJ)
+The goal of this project is to support learning of the Django framework, with a primary focus on backend development. Along the way, it incorporates a variety of external services to meet different functional requirements. While the app is fundamentally backend-driven, certain advanced features—such as multi-factor authentication (MFA), donation payments, and user account deletion—introduce significant frontend complexity. As such, a solid understanding of JavaScript is recommended before exploring these sections: [JavaScript Intermediate Docs](https://1drv.ms/b/c/a8ea73639e1a076a/ETnwCT76VaxLvtN9ZxOtkNQB5X5aoPzHePCMs88QNS6Z9Q?e=XNWNiJ)
 
 ## Disclaimer
 

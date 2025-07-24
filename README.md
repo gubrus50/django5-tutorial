@@ -8,7 +8,7 @@ I am still a learner myself. Throughout development, I encountered and had to ad
 
 ## Documentation & Project
 
-To get started, simply download <code>Django.pdf</code> and follow the instructions inside.
+To get started, simply **download** [Django.pdf](https://github.com/gubrus50/django5-tutorial/blob/main/Django.pdf) and follow the instructions inside.
 
 <strong>NOTE</strong>:
 <ul>

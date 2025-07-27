@@ -39,7 +39,8 @@ and follow the instructions inside.
 7. [Payments](#payments)<br>
 8. [Errors](#errors)<br>
 9. [Contacting Support](#contacting-support)<br>
-10. (...a work in progress, monitor tasks with flower + celery)
+
+More features are found within the documentation. 
 
 <br>
 

@@ -79,7 +79,7 @@ More features are found within the documentation.
       <hr>
       To handle media storage efficiently, the application integrates with Amazon S3 buckets. This setup ensures profile pictures are stored securely and reliably, leveraging AWS's globally distributed, scalable infrastructure. Offloading image management to S3 also simplifies server logic and improves performance across deployments.
       <hr>
-      This app can optionally protect the clients of all ages by filtering out the profiles with NSFW images using third-party service: <a href="https://deepai.org/">DeepaAIhttps</a>
+      This app can optionally protect the clients of all ages by filtering out the profiles with NSFW images using third-party service: <a target="_blank" href="https://deepai.org/">DeepaAI</a>
       <hr>
       Users can delete their account anytime from the profile page, giving them full control over their data and online presence.
       <br>

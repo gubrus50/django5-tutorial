@@ -6,18 +6,32 @@
 
     <h5>Alternative options</h5>
     <hr>
-    <p>Send OTP via</p>
-    <button class="btn btn-outline-primary w-100 mb-1" type="button"
-        hx-post="{% url 'request_mfa' 'otp_email' %}"
-        hx-trigger="click throttle:1s"
-        hx-swap="none">
-        <strong>Email</strong>
-    </button>
-    <button class="btn btn-outline-primary w-100" type="button"
-        hx-post="{% url 'request_mfa' 'otp_sms' %}"
-        hx-trigger="click throttle:1s"
-        hx-swap="none">
-        <strong>SMS</strong>
-    </button>
-
+    {% if not otp_services.email and not otp_services.sms %}
+        <p>Email and SMS OTP services are temporarily unavailable. For further assistance, head to our contact page.</p>
+        <a href="{% url 'contact' %}">
+            <button class="btn btn-outline-primary" type="button">Support Team</button>
+        </a>
+    {% else %}
+        <p>Send OTP via</p>
+        <button class="btn btn-outline-primary w-100 mb-1" type="button"
+        {% if otp_services.email %}
+            hx-post="{% url 'request_mfa' 'otp_email' %}"
+            hx-trigger="click throttle:1s"
+            hx-swap="none"
+        {% else %}
+            disabled
+        {% endif %}>
+            <strong>Email</strong>
+        </button>
+        <button class="btn btn-outline-primary w-100" type="button"
+        {% if otp_services.sms %}
+            hx-post="{% url 'request_mfa' 'otp_sms' %}"
+            hx-trigger="click throttle:1s"
+            hx-swap="none"
+        {% else %}
+            disabled
+        {% endif %}>
+            <strong>SMS</strong>
+        </button>
+    {% endif %}
 </form>

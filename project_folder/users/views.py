@@ -21,6 +21,7 @@ from .forms import (
 
 from .utils.throttle import ThrottleOTPRequestExpiryDate as OTPThrottle
 from .utils import (
+    get_otp_services_availability,
     get_users_mfa_secret_as_qrcode_base64,
     email_otp_to_user,
     sms_otp_to_user,
@@ -240,6 +241,10 @@ def _all_steps_completed(request, steps):
 
 
 
+
+
+
+    
 def requestOTPView(request, method):
     if request.method != 'POST':
         return HttpResponseBadRequest()
@@ -280,7 +285,6 @@ def requestOTPView(request, method):
 
     return response
  
-
 
 
 
@@ -512,6 +516,7 @@ class CustomLoginView(LoginView):
                 'step': 'otp_qrcode',
                 'submit': 'Login',
                 'submit_boldend': 'Securly via MFA',
+                'otp_services': get_otp_services_availability(),
                 # Initial data for, in circulation, HX-POST requests
                 'user_id': user.id,
                 'next': request.GET.get('next'),

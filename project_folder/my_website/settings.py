@@ -15,7 +15,7 @@ import os
 from dotenv import load_dotenv # Remove this code in production
 load_dotenv()                  # Remove this code in production
 
-
+DOMAIN = str(os.environ['DOMAIN'])
 COMPANY_NAME = str(os.environ['COMPANY_NAME'])
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -210,7 +210,11 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False # Avoid SSL because it’s less secure
 
-EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+# https://www.zoho.com/commerce/api/oauth-step-1.html
+ZOHO_ZOID = os.getenv('ZOHO_ZOID')
+ZOHO_ACCESS_TOKEN = os.getenv('ZOHO_ACCESS_TOKEN')
+
+EMAIL_HOST_USER = f'{os.getenv('EMAIL_HOST_USERNAME')}@{DOMAIN}'
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = f'(Domain) <{EMAIL_HOST_USER}>'
 

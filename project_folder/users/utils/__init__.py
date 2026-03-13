@@ -1,14 +1,15 @@
 from django.core.files.uploadedfile import UploadedFile
-from django.core.mail import get_connection, send_mail
+from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
+from users.tests import send_test_email
 
-import io, re, base64, requests, smtplib, stripe, boto3, pyotp, qrcode
-from smtplib import SMTPException
+import io, re, base64, requests, stripe, boto3, pyotp, qrcode
 from botocore.exceptions import ClientError
+
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -154,76 +155,6 @@ def get_or_create_stripe_customer(user):
 
 
 
-def zoho_domain_status(
-    domain=settings.DOMAIN,
-    access_token=settings.ZOHO_ACCESS_TOKEN,
-    zoid=settings.ZOHO_ZOID
-):
-
-    url = f'https://mail.zoho.com/api/organization/{zoid}/domains/{domain}'
-    headers = {'Authorization': f'Zoho-oauthtoken {access_token}'}
-
-    response = requests.get(url, headers=headers)
-    data = response.json().get('data')
-
-    if not data:
-        return False, 'Invalid response from Zoho'
-
-    if not data.get('is_verified'):
-        return False, f'Domain {domain} is NOT verified in Zoho'
-
-    if not data.get('is_mail_hosting_enabled'):
-        return False, f'Mail hosting is disabled for {domain}'
-
-    return True, f'Domain {domain} is verified and ready'
-
-
-
-
-def smtp_health_check():
-    """
-    Performs a non‑destructive SMTP handshake using Django's EMAIL_* settings.
-    Does NOT send an email body — only MAIL FROM / RCPT TO.
-    """
-
-    host = settings.EMAIL_HOST
-    port = settings.EMAIL_PORT
-    username = settings.EMAIL_HOST_USER
-    password = settings.EMAIL_HOST_PASSWORD
-    use_tls = settings.EMAIL_USE_TLS
-    from_email = settings.DEFAULT_FROM_EMAIL
-    test_recipient = settings.EMAIL_HOST_USER
-
-    try:
-        server = smtplib.SMTP(host, port, timeout=10)
-
-        if use_tls:
-            server.starttls()
-
-        server.login(username, password)
-
-        # MAIL FROM
-        code, msg = server.mail(from_email)
-        if code >= 400:
-            return False, f'MAIL FROM failed: {code} {msg}'
-
-        # RCPT TO
-        code, msg = server.rcpt(test_recipient)
-        if code >= 400:
-            return False, f'RCPT TO failed: {code} {msg}'
-
-        server.quit()
-        return True, 'SMTP server is healthy'
-
-    except SMTPException as e:
-        return False, f'SMTP error: {e}'
-
-    except Exception as e:
-        return False, f'Connection error: {e}'
-
-
-
-
 def get_or_create_mfa_secret_for_user(user_instance):
     """
     Generates a random base32 string and saves it as mfa_secret
@@ -310,15 +241,21 @@ def get_otp_services_availability():
 
     # Email service
 
-    smtp_status, smtp_error = smtp_health_check()
-    zd_status, zd_error = zoho_domain_status()
-
-    otp_services['email'] = smtp_status and zd_status
+    bool_response, message = send_test_email(
+        from_email=settings.EMAIL_HOST_USER,
+        to_email=settings.EMAIL_HOST_RECIPIENT_USER,
+        subject='MFA Email',
+        message="Ignore this email.\n\n"
+                "State: Success\n"
+                "Framework: Django\n"
+                "App: users\n"
+                "Call: users.utils - get_otp_services_availability()"
+    )
+    otp_services['email'] = bool_response
 
     # SMS service
 
-    number, n_error = get_mfa_service_number_instance()
-
+    number, message = get_mfa_service_number_instance()
     try:
         otp_services['sms'] = number.capabilities.get('sms') is True
     except Exception:

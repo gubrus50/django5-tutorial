@@ -210,14 +210,10 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False # Avoid SSL because it’s less secure
 
-# https://www.zoho.com/commerce/api/oauth-step-1.html
-ZOHO_ZOID = os.getenv('ZOHO_ZOID')
-ZOHO_ACCESS_TOKEN = os.getenv('ZOHO_ACCESS_TOKEN')
-
-EMAIL_HOST_USER = f'{os.getenv('EMAIL_HOST_USERNAME')}@{DOMAIN}'
+EMAIL_HOST_USER = f"{os.getenv('EMAIL_HOST_USERNAME')}@{DOMAIN}"
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = f'(Domain) <{EMAIL_HOST_USER}>'
-
+DEFAULT_FROM_EMAIL = f'({DOMAIN}) <{EMAIL_HOST_USER}>'
+EMAIL_HOST_RECIPIENT_USER = f"{os.getenv('EMAIL_HOST_RECIPIENT_USERNAME')}@{DOMAIN}"
 
 # Django Phonenumber Field 
 

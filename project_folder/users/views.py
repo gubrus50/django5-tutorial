@@ -337,11 +337,17 @@ def requestMFAModalView(request, modal):
         'step': modal,
         'submit': 'Login',
         'submit_boldend': 'Securly via MFA',
+        
+        # Provide alternative OTP request options OR support
+        **({'otp_services': get_otp_services_availability()}
+        if modal == 'otp_qrcode' else {}),
+        
         # HX-POST data (in circulation)
         'next': next_url,
         'user_id': request.POST.get('user_id'),
         'email': request.POST.get('masked_email'),
         'phone_number': request.POST.get('masked_phone_number'),
+
         # Include OTP_REQUEST_THROTTLE_INTERVAL used in resend_otp.html <component>
         **({'OTP_REQUEST_THROTTLE_INTERVAL': settings.OTP_REQUEST_THROTTLE_INTERVAL} 
         if modal != 'otp_qrcode' else {})

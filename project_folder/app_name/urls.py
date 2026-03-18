@@ -15,4 +15,5 @@ urlpatterns = [
     path('buy-plan/', views.buyPlanView, name='buy_plan'),
     path('buy-plan/intent/', views.buyPlanPaymentIntentView, name='buy_plan_intent'),
     path('payment-success/', views.paymentSuccessView, name='payment_success'),
+    path('docs/<str:document_name>', views.documentView, name='document'),
 ]

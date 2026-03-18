@@ -295,7 +295,7 @@ def email_client_and_support_team(email, subject, message):
         subject=f'Support Request: {subject}',
         message=f'{message}\n\nRequest from (Email): {email}',
         from_email=settings.EMAIL_HOST_USER,
-        recipient_list=['support@walentynki.site']
+        recipient_list=[f'support@{settings.DOMAIN}']
     )
 
 
@@ -446,3 +446,15 @@ def buyPlanPaymentIntentView(request):
 
 def paymentSuccessView(request):
     return render(request, 'app_name/payment_success.html')
+
+
+
+
+def documentView(request, document_name):
+    template = f'app_name/docs/{document_name}.html'
+    context = {
+        'company_name': settings.COMPANY_NAME,
+        'website_url': settings.DOMAIN,
+        'contact_email': f'support@{settings.DOMAIN}'
+    }
+    return render(request, template, context)

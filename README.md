@@ -9,7 +9,7 @@ I am still a learner myself. Throughout development, I encountered and had to ad
 ## Documentation & Project
 
 To get started, simply **download** [Django.pdf](https://github.com/gubrus50/django5-tutorial/blob/main/Django.pdf)<br>
-Or open the via OneDrive: [Django Tutorial 2025.pdf](https://1drv.ms/b/c/a8ea73639e1a076a/EZrXCzc6jvhJlG79_Tq_Ud4B6ijGotWES--Dwezydwz_Vw?e=A3ioO2),
+Or open the via OneDrive: [Django Tutorial 2026.pdf](https://1drv.ms/b/c/a8ea73639e1a076a/IQDY1QVty1t3RJG35EjN_0X1AcEzc_7wD-WNojp09YKegXM?e=Jv0g9w),
 and follow the instructions inside.
 
 <strong>NOTE</strong>:

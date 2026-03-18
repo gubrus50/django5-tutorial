@@ -523,6 +523,7 @@ class CustomLoginView(LoginView):
                 'submit': 'Login',
                 'submit_boldend': 'Securly via MFA',
                 'otp_services': get_otp_services_availability(),
+                
                 # Initial data for, in circulation, HX-POST requests
                 'user_id': user.id,
                 'next': request.GET.get('next'),

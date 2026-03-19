@@ -455,6 +455,7 @@ def documentView(request, document_name):
     context = {
         'company_name': settings.COMPANY_NAME,
         'website_url': settings.DOMAIN,
-        'contact_email': f'support@{settings.DOMAIN}'
+        'contact_email': f'support@{settings.DOMAIN}',
+        'server_email': settings.EMAIL_HOST_USER,
     }
     return render(request, template, context)

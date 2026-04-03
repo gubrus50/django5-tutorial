@@ -10,7 +10,7 @@ urlpatterns = [
     path('contact/', views.contactFormView, name='contact'),
 
     path('donate/', views.donateView, name='donate'),
-    path('donate/update-intent/', views.donateUpdatePaymentIntentView, name='donate_update_intent'), # Added
+    path('donate/update-intent/', views.donateUpdatePaymentIntentView, name='donate_update_intent'),
 
     path('buy-plan/', views.buyPlanView, name='buy_plan'),
     path('buy-plan/intent/', views.buyPlanPaymentIntentView, name='buy_plan_intent'),

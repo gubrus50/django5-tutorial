@@ -317,10 +317,4 @@ More features are found within the documentation.
     </td>
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/contactFormView.png"></td>
   </tr>
-  <tr>
-    <td valign="top">
-      ⚠️ The page is not currently linked in the UI and must be accessed manually.
-      <br>
-    </td>
-  </tr>
 </table>

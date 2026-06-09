@@ -25,9 +25,32 @@
 {% if models %}
     <div class="loader mx-auto my-5"
         hx-get="{% url 'index' %}?page={{ next_page_number }}{% if search_filter_params %}&{{ search_filter_params }}{% endif %}" 
-        hx-trigger="revealed" 
+        hx-trigger="revealed"
         hx-swap="outerHTML">
     </div>
+    <script type="text/javascript">
+        // Request for next models when client is back online
+        (() => {
+            const script = document.currentScript,
+                  parent = script.parentElement,
+                  loader = parent.querySelector('.loader'),
+
+            loadNextModels = () => {
+                htmx.trigger(loader, 'revealed');
+                window.removeEventListener('online', loadNextModels);
+                loader._hasOnlineHandler = false;
+            };
+
+            loader.addEventListener('htmx:trigger', () => {
+                if (!navigator.onLine && !loader._hasOnlineHandler) {
+                    window.addEventListener('online', loadNextModels);
+                    loader._hasOnlineHandler = true;
+                }
+            })
+
+            script.remove();
+        })();
+    </script>
 {% else %}
     <p class="text-center mx-auto my-5">No more models to load</p>
 {% endif %}

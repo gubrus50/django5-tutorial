@@ -36,16 +36,19 @@
                   loader = parent.querySelector('.loader'),
 
             loadNextModels = () => {
-                htmx.trigger(loader, 'revealed');
+                isScrolledIntoView(loader) // utilities.js
+                    ? htmx.trigger(loader, 'revealed')
+                    : delete loader.dataset.hxRevealed;
+                    
                 window.removeEventListener('online', loadNextModels);
                 loader._hasOnlineHandler = false;
             };
 
             loader.addEventListener('htmx:trigger', () => {
-                if (!navigator.onLine && !loader._hasOnlineHandler) {
-                    window.addEventListener('online', loadNextModels);
-                    loader._hasOnlineHandler = true;
-                }
+                if (navigator.onLine || loader._hasOnlineHandler) return;
+
+                window.addEventListener('online', loadNextModels);
+                loader._hasOnlineHandler = true;
             })
 
             script.remove();

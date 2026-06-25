@@ -1,0 +1,547 @@
+{% load custom_filters %}
+
+{# Get safe step name once #}
+{% with step_keb=step|replace:'_|-' %}
+{% with modal_id=step_keb|add:'-modal' %}
+
+{# Fancy Modal - Premium Glass with Enhanced Effects #}
+<div id="{{ modal_id }}" 
+     class="fixed inset-0 z-50 flex items-center justify-center hidden" 
+     role="dialog" 
+     aria-modal="true"
+     aria-labelledby="{{ step_keb }}-label"
+     aria-hidden="true"
+     data-modal-backdrop="static"
+     style="pointer-events: none; opacity: 0; visibility: hidden; transition: none;">
+    
+    {# Premium Glassy Backdrop #}
+    <div class="fixed inset-0" 
+         data-modal-backdrop
+         style="pointer-events: none; z-index: 999998;">
+        
+        {# Base dark overlay #}
+        <div class="absolute inset-0 bg-black/40"
+             style="opacity: 0; transition: opacity 800ms cubic-bezier(0.22, 1, 0.36, 1); pointer-events: none;"
+             data-glass-base>
+        </div>
+        
+        {# Multi-layer glass effect #}
+        <div class="absolute inset-0"
+             style="opacity: 0; backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); transition: all 1400ms cubic-bezier(0.22, 1, 0.36, 1); pointer-events: none;"
+             data-glass-layer>
+            
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-600/30 via-blue-600/20 to-pink-600/30"
+                 style="opacity: 0; transition: opacity 1200ms cubic-bezier(0.22, 1, 0.36, 1) 300ms; pointer-events: none;"
+                 data-glass-gradient>
+            </div>
+            
+            <div class="absolute inset-0 animate-[shimmer_8s_ease-in-out_infinite_2s]"
+                 style="background: linear-gradient(135deg, transparent 10%, rgba(255,255,255,0.15) 40%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.15) 60%, transparent 90%); background-size: 400% 400%; opacity: 0; transition: opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1) 600ms; pointer-events: none;"
+                 data-glass-shimmer>
+            </div>
+        </div>
+        
+        {# Noise texture #}
+        <div class="absolute inset-0"
+             style="background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noise"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noise)" opacity="1"/%3E%3C/svg%3E');
+                   opacity: 0; transition: opacity 1800ms cubic-bezier(0.22, 1, 0.36, 1) 800ms; pointer-events: none;"
+                   data-glass-noise>
+        </div>
+        
+        {# Vignette #}
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_30%,_rgba(0,0,0,0.7)_100%)]"
+             style="opacity: 0; transition: opacity 1400ms cubic-bezier(0.22, 1, 0.36, 1) 400ms; pointer-events: none;"
+             data-glass-vignette>
+        </div>
+    </div>
+    
+    {# Modal container #}
+    <div class="relative w-full max-w-md mx-4 max-h-[90vh] flex flex-col"
+         onclick="event.stopPropagation()"
+         style="pointer-events: auto; z-index: 999999;">
+        
+        {# Premium Glass Card #}
+        <div class="relative rounded-2xl overflow-hidden shadow-2xl border border-white/20"
+             style="background: rgba(20, 20, 30, 0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); pointer-events: auto; opacity: 0; transform: scale(0.92) translateY(30px); transition: all 1000ms cubic-bezier(0.22, 1, 0.36, 1) 200ms;"
+             data-modal-card>
+            
+            {# Glass reflection #}
+            <div class="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5 pointer-events-none"
+                 style="opacity: 0; transition: opacity 1200ms cubic-bezier(0.22, 1, 0.36, 1) 300ms;"
+                 data-glass-reflection>
+            </div>
+            
+            {# Glow border #}
+            <div class="absolute inset-0 pointer-events-none"
+                 style="opacity: 0; box-shadow: inset 0 0 80px rgba(139, 92, 246, 0.05), 0 0 60px rgba(139, 92, 246, 0.08); transition: opacity 1400ms cubic-bezier(0.22, 1, 0.36, 1) 400ms;"
+                 data-glass-glow>
+            </div>
+            
+            {# Corner accents #}
+            <div class="absolute top-0 right-0 w-20 h-20 pointer-events-none"
+                 style="opacity: 0; transition: opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1) 600ms;"
+                 data-glass-corners>
+                <div class="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-purple-500/20 rounded-tr-2xl"></div>
+            </div>
+            <div class="absolute bottom-0 left-0 w-20 h-20 pointer-events-none"
+                 style="opacity: 0; transition: opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1) 700ms;"
+                 data-glass-corners>
+                <div class="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-purple-500/20 rounded-bl-2xl"></div>
+            </div>
+            
+            {# Modal header #}
+            <div class="relative flex items-center justify-between p-5 border-b border-white/10"
+                 style="opacity: 0; transform: translateY(-8px); transition: all 600ms cubic-bezier(0.22, 1, 0.36, 1) 600ms; pointer-events: auto;"
+                 data-modal-header>
+                <div class="flex items-center gap-3">
+                    <div class="w-1 h-6 bg-gradient-to-b from-purple-400 to-pink-400 rounded-full"></div>
+                    <h5 class="text-lg font-semibold text-white" id="{{ step_keb }}-label">{{ title }}</h5>
+                </div>
+                <span class="text-sm text-white/50 font-mono tracking-wider">{{ page }}</span>
+                <button type="button" 
+                        class="text-white/40 hover:text-white hover:bg-white/10 rounded-lg p-2 transition-all duration-300 hover:scale-110 active:scale-90"
+                        data-modal-close
+                        aria-label="Close"
+                        style="pointer-events: auto;">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                
+                {# SERIALIZE on_delete_data #}
+
+                {% if on_delete_data %}
+                    {{ on_delete_data|json_script:'modals-on-delete-data' }}
+                {% else %}
+                    <script id="modals-on-delete-data" type="application/json">null</script>
+                {% endif %}
+
+                <script type="text/javascript">
+                    /* Declare the onAnyClosedModal() on a global scope
+                    /
+                    /  if it hasn't been already to remove annoying
+                    /  error message: onAnyClosedModal is not defined
+                    / 
+                    /  This function is optional, it does not have to be declared
+                    */
+                    if (typeof window.onAnyClosedModal === 'undefined') {
+                        window.onAnyClosedModal = () => {};
+                    }
+
+                    (() => {
+                        const header = document.currentScript.parentElement;
+                        const closeBtn = header.querySelector('[data-modal-close]');
+
+                        const scriptTag = document.getElementById('modals-on-delete-data');
+                        let parsedData = null;
+
+                        try {
+                            parsedData = JSON.parse(scriptTag.textContent);
+                        } catch (error) {
+                            console.warn('modals/base.html - Failed to parse on_delete_data JSON', error);
+                        }
+
+                        closeBtn?.addEventListener("click", function (e) {
+                            e.preventDefault();
+                            onAnyClosedModal(parsedData);
+                            if (typeof closeModal === 'function') {
+                                const modal = header.closest('[id$="-modal"]');
+                                closeModal(modal);
+                            }
+                        });
+                    })();
+                </script>
+            </div>
+            
+            {# Modal body #}
+            <div class="relative p-5 overflow-y-auto flex-1 text-gray-300"
+                 style="opacity: 0; transform: translateY(10px); transition: all 600ms cubic-bezier(0.22, 1, 0.36, 1) 700ms; pointer-events: auto;"
+                 data-modal-body>
+                {% block body %}{% endblock %}
+            </div>
+            
+            {# Modal footer as form #}
+            <form id="{{ step_keb }}-form" 
+                  class="modal-footer relative p-5 border-t border-white/10 bg-white/5 rounded-b-2xl"
+                  style="opacity: 0; transform: translateY(20px); transition: all 600ms cubic-bezier(0.22, 1, 0.36, 1) 800ms; pointer-events: auto;"
+                  data-modal-form
+                  hx-post="{{ post_url }}"
+                  hx-trigger="submit throttle:200ms"
+                  hx-swap="none">
+                {% csrf_token %}
+                {% block form %}{% endblock %}
+                <div class="mb-3" style="pointer-events: auto;">
+                    {% block input %}{% endblock %}
+                    <input type="hidden" name="step" value="{{ step }}">
+                </div>
+                <button type="submit" 
+                        class="w-full px-4 py-3 text-white rounded-xl transition-all duration-300 font-medium
+                               bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 
+                               hover:from-purple-700 hover:via-indigo-700 hover:to-pink-700
+                               focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-900
+                               disabled:opacity-50 disabled:cursor-not-allowed
+                               shadow-lg hover:shadow-purple-500/30 transform hover:scale-[1.02] active:scale-95
+                               modal-submit-button"
+                        hx-post="{{ post_url }}"
+                        hx-trigger="click delay:1000ms"
+                        hx-swap="none"
+                        style="pointer-events: auto;">
+                    <span class="spinner-border inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin hidden sr-only" 
+                          role="status" 
+                          aria-hidden="true"></span>
+                    <span class="button-text">{{ submit }}{% if submit_boldend %} <strong class="ml-1">{{ submit_boldend }}</strong>{% endif %}</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{# Animations and Styles #}
+<style>
+
+/* ===== BOUNCE ANIMATION ===== */
+@keyframes bounce {
+    0% {
+        transform: scale(1);
+    }
+    30% {
+        transform: scale(1.05);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+    70% {
+        transform: scale(1.02);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.bounce {
+    animation: bounce 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+}
+
+/* ===== SHIMMER ANIMATION ===== */
+@keyframes shimmer {
+    0% {
+        background-position: -400% 50%;
+    }
+    100% {
+        background-position: 400% 50%;
+    }
+}
+
+/* ===== SPINNER ANIMATION ===== */
+@keyframes spinner-border {
+    to { transform: rotate(360deg); }
+}
+
+.spinner-border {
+    animation: spinner-border 0.75s linear infinite !important;
+}
+
+/* ===== HTMX INDICATOR ===== */
+.htmx-request .spinner-border {
+    display: inline-block !important;
+}
+
+/* ===== BACKDROP FALLBACK ===== */
+@supports not (backdrop-filter: blur(12px)) {
+    [style*="backdrop-filter"] {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+}
+
+/* ===== ENSURE ALL INTERACTIVE ELEMENTS WORK ===== */
+#{{ modal_id }} input,
+#{{ modal_id }} button,
+#{{ modal_id }} textarea,
+#{{ modal_id }} select,
+#{{ modal_id }} a,
+#{{ modal_id }} .modal-submit-button,
+#{{ modal_id }} [data-modal-close] {
+    pointer-events: auto !important;
+    position: relative;
+    z-index: 10;
+}
+
+#{{ modal_id }} label,
+#{{ modal_id }} p,
+#{{ modal_id }} span,
+#{{ modal_id }} h5 {
+    pointer-events: auto !important;
+}
+
+#{{ step_keb }}-form,
+#{{ step_keb }}-form * {
+    pointer-events: auto !important;
+}
+
+/* ===== PREMIUM INPUT GROUP - JOINED AS ONE ELEMENT ===== */
+#{{ modal_id }} .input-group {
+    display: flex !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    border-radius: 0.75rem !important;
+    overflow: hidden !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+}
+
+#{{ modal_id }} .input-group:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.08);
+}
+
+#{{ modal_id }} .input-group:focus-within {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: #8b5cf6 !important;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12), 0 8px 30px rgba(139, 92, 246, 0.08) !important;
+    transform: translateY(-2px);
+}
+
+#{{ modal_id }} .input-group-text {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 0.75rem 1rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: #a78bfa !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    min-width: 90px !important;
+    justify-content: center !important;
+    letter-spacing: 0.3px;
+    flex-shrink: 0 !important;
+}
+
+#{{ modal_id }} .input-group-input {
+    flex: 1 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    padding: 0.75rem 1rem !important;
+    color: #e5e7eb !important;
+    box-shadow: none !important;
+    outline: none !important;
+    font-size: 0.95rem !important;
+    min-width: 0 !important;
+    width: 100% !important;
+}
+
+#{{ modal_id }} .input-group-input:focus {
+    box-shadow: none !important;
+    background: transparent !important;
+    outline: none !important;
+}
+
+#{{ modal_id }} .input-group-input::placeholder {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ===== INVALID STATE - ENHANCED RED HIGHLIGHT ===== */
+#{{ modal_id }} .is-invalid .input-group {
+    border-color: #ef4444 !important;
+    border-width: 2px !important;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15), 0 0 25px rgba(239, 68, 68, 0.15) !important;
+    background: rgba(239, 68, 68, 0.06) !important;
+    animation: shake 0.4s ease-in-out !important;
+}
+
+#{{ modal_id }} .is-invalid .input-group-text {
+    color: #ef4444 !important;
+    border-color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+#{{ modal_id }} .is-invalid .input-group-input {
+    color: #fca5a5 !important;
+}
+
+#{{ modal_id }} .is-invalid .input-group-input::placeholder {
+    color: rgba(239, 68, 68, 0.5) !important;
+}
+
+#{{ modal_id }} .is-invalid:not(.input-group) {
+    border-color: #ef4444 !important;
+    border-width: 2px !important;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15), 0 0 25px rgba(239, 68, 68, 0.15) !important;
+    background: rgba(239, 68, 68, 0.06) !important;
+    animation: shake 0.4s ease-in-out !important;
+}
+
+/* ===== SHAKE ANIMATION ===== */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10% { transform: translateX(-8px); }
+    30% { transform: translateX(8px); }
+    50% { transform: translateX(-6px); }
+    70% { transform: translateX(6px); }
+    90% { transform: translateX(-3px); }
+}
+
+/* ===== INVALID ICON IN LABEL ===== */
+#{{ modal_id }} .is-invalid .input-group-text::after {
+    content: " ⚠️" !important;
+    font-size: 0.8rem !important;
+}
+
+/* ===== MOBILE RESPONSIVE - STACK LABEL ABOVE INPUT ===== */
+@media (max-width: 640px) {
+    #{{ modal_id }} .input-group {
+        flex-direction: column !important;
+        border-radius: 0.75rem !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+        gap: 0 !important;
+    }
+    
+    #{{ modal_id }} .input-group:hover {
+        transform: none !important;
+    }
+    
+    #{{ modal_id }} .input-group:focus-within {
+        transform: none !important;
+    }
+    
+    #{{ modal_id }} .input-group-text {
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        min-width: unset !important;
+        padding: 0.6rem 1rem !important;
+        justify-content: flex-start !important;
+        font-size: 0.8rem !important;
+        background: rgba(255, 255, 255, 0.03) !important;
+        width: 100% !important;
+        border-radius: 0.75rem 0.75rem 0 0 !important;
+    }
+    
+    #{{ modal_id }} .input-group-input {
+        padding: 0.7rem 1rem !important;
+        font-size: 0.9rem !important;
+        border-radius: 0 0 0.75rem 0.75rem !important;
+        width: 100% !important;
+    }
+    
+    #{{ modal_id }} .input-group-input::placeholder {
+        font-size: 0.85rem !important;
+    }
+    
+    /* Mobile invalid state */
+    #{{ modal_id }} .is-invalid .input-group {
+        border-color: #ef4444 !important;
+        border-width: 2px !important;
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15), 0 0 25px rgba(239, 68, 68, 0.15) !important;
+        background: rgba(239, 68, 68, 0.06) !important;
+        animation: shake 0.4s ease-in-out !important;
+    }
+    
+    #{{ modal_id }} .is-invalid .input-group-text {
+        border-bottom: 1px solid #ef4444 !important;
+        border-right: none !important;
+    }
+}
+
+/* ===== EXTRA SMALL MOBILE ADJUSTMENTS ===== */
+@media (max-width: 480px) {
+    #{{ modal_id }} .input-group-text {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.75rem !important;
+        min-height: 36px !important;
+    }
+    
+    #{{ modal_id }} .input-group-input {
+        padding: 0.6rem 0.75rem !important;
+        font-size: 0.85rem !important;
+        min-height: 40px !important;
+    }
+}
+
+/* ===== INDIVIDUAL INPUT STYLING (fallback) ===== */
+#{{ modal_id }} input:not(.input-group-input):not([type="hidden"]):not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]),
+#{{ modal_id }} textarea:not(.input-group textarea),
+#{{ modal_id }} select:not(.input-group select) {
+    width: 100% !important;
+    padding: 0.75rem 1rem !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #e5e7eb !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 0.75rem !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.95rem !important;
+    outline: none !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+}
+
+#{{ modal_id }} input:not(.input-group-input):hover,
+#{{ modal_id }} textarea:not(.input-group textarea):hover,
+#{{ modal_id }} select:not(.input-group select):hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.1);
+}
+
+#{{ modal_id }} input:not(.input-group-input):focus,
+#{{ modal_id }} textarea:not(.input-group textarea):focus,
+#{{ modal_id }} select:not(.input-group select):focus {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: #8b5cf6 !important;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15), 0 8px 30px rgba(139, 92, 246, 0.1) !important;
+    transform: translateY(-2px);
+}
+
+#{{ modal_id }} input::placeholder,
+#{{ modal_id }} textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ===== SELECT DROPDOWN ===== */
+#{{ modal_id }} select {
+    appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239ca3af' stroke-width='2' fill='none'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.875rem center !important;
+    padding-right: 2.5rem !important;
+}
+
+#{{ modal_id }} select option {
+    background: #1e293b !important;
+    color: #e5e7eb !important;
+}
+
+/* ===== DANGER BADGE / INTERVAL STYLING ===== */
+#{{ modal_id }} .interval,
+#{{ modal_id }} .badge.bg-danger {
+    display: inline-block !important;
+    padding: 0.25rem 0.75rem !important;
+    background: #dc2626 !important;
+    color: white !important;
+    font-weight: 700 !important;
+    font-size: 0.8rem !important;
+    border-radius: 9999px !important;
+    border: 2px solid #ef4444 !important;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+    letter-spacing: 0.3px !important;
+}
+
+/* ===== DANGER TEXT ===== */
+#{{ modal_id }} .text-danger,
+#{{ modal_id }} .fw-bold.text-danger {
+    color: #ef4444 !important;
+    font-weight: 700 !important;
+}
+</style>
+
+{% endwith %}
+{% endwith %}

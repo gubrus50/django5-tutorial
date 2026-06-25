@@ -1,0 +1,19 @@
+{% load custom_filters %}
+
+<div class="input-group">
+    <span class="input-group-text">
+        {{ label }}
+    </span>
+    <input required
+    
+       name="{{ name }}"
+       type="{% if name == 'password' %}password{% else %}text{% endif %}"
+       class="input-group-input"
+
+       aria-label="{{ aria_label }}"
+       aria-describedby="{{ step|replace:'_|-' }}-instructions"
+
+       hx-post="{{ post_url }}"
+       hx-trigger="{% if name == 'password' %}submit throttle{% else %}input changed delay{% endif %}:250ms"
+       hx-swap="none">
+</div>

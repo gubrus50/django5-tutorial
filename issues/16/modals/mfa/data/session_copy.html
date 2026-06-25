@@ -1,0 +1,23 @@
+{% comment %}
+    
+session_copy.html serves as a safeguard for verifying session integrity by posting back session-related variables.
+The <input> tags act as a security measure to ensure the posted values match those stored in the backend session.
+
+If there is a mismatch between these values, it indicates a potential issue:
+
+  - Either the session variable was altered or cleared.
+  - Or the posted session copy variable was modified before submission.
+
+In such cases, user verification fails due to unauthorized modifications, requiring
+the "Multi-Factor Authentication" (MFA) modal to reset before proceeding.
+
+{% endcomment %}
+
+{% if next %}
+  {# 'next' cannot be present when 'None' otherwise there will be issues with redirection #}
+  <input type="hidden" name="next" value="{{ next }}">
+{% endif %}
+{% if user_id %}
+  {# 'user_id' is not required when Enabling MFA #}
+  <input type="hidden" name="user_id" value="{{ user_id }}">
+{% endif %}

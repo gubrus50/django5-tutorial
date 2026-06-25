@@ -1,0 +1,241 @@
+{% load static %}
+
+{# NOTE: delay = HX-TRIGGER and TIMEOUT delay in <script> #}
+{# NOTE: policy_interval = Period in which user's data should be removed #}
+
+{% with delay='500' policy_interval='30 - 90 days' %}
+
+{# NOTE: These scripts are added once on entering the profile.html template #}
+<script name="count-down" src="{% static 'users/js/includes/count_down.js' %}"></script>
+
+{# NOTE: This <script> contains copy functions of modals.js at users/static #}
+<script name="loading-animation-for-buttons" type="text/javascript">
+const setLoadingButton = (button) => {
+    const spinner = button.querySelector('.spinner-grow');
+    const text = button.querySelector('.button-text');
+    if (spinner) spinner.classList.remove('hidden');
+    if (text) text.textContent = 'loading...';
+}
+
+const setNormalButton = (button) => {
+    const spinner = button.querySelector('.spinner-grow');
+    const text = button.querySelector('.button-text');
+    if (spinner) spinner.classList.add('hidden');
+    if (text) text.innerHTML = button.dataset.name;
+}
+</script>
+
+{# NOTE: hx-swap-oob content is updated for every HTMX request TO deleteUserView() #}
+
+<form id="delete-account" 
+      class="w-full space-y-4"
+      {% if request.user.account.deletion_date %}
+        hx-post="{% url 'delete_this_user' 'false' %}"
+      {% else %}
+        hx-post="{% url 'delete_this_user' 'true' %}"
+      {% endif %}
+      hx-trigger="submit delay:{{ delay }}ms"
+      hx-swap="none"
+      hx-swap-oob="{% if swap_oob %}{{ swap_oob }}{% else %}none{% endif %}">
+    
+    {% csrf_token %}
+
+    {# Hence, this <script> is always updated for every submit of this <form> #}
+    {% if hide_modals %}
+        <script type="text/javascript">            
+            typeof hideModals === 'function' && hideModals();
+            document.currentScript.remove();
+        </script>
+    {% endif %}
+
+    {% if request.user.account.deletion_date %}
+        <!-- Deletion Active State -->
+        <div class="bg-rose-500/10 backdrop-blur-sm rounded-2xl p-4 border border-rose-500/30">
+            <!-- Technical Details - Collapsible -->
+            <details class="mb-3">
+                <summary class="text-sm font-medium text-gray-300 cursor-pointer hover:text-white transition-colors">
+                    Technical Details
+                </summary>
+                <div class="mt-2 space-y-1.5 text-xs">
+                    <span class="inline-block px-2.5 py-1 bg-rose-500/20 text-rose-300 rounded-full border border-rose-500/30">DELETE {{ request.user.username }}</span>
+                    <span class="inline-block px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 ml-1">ID {{ request.user.id }}</span>
+                    <span class="inline-block px-2.5 py-1 bg-gray-500/20 text-gray-300 rounded-full border border-gray-500/30 ml-1">DUI {{ DELETE_USER_INTERVAL }}</span>
+                    <span class="inline-block px-2.5 py-1 bg-white/10 text-gray-300 rounded-full border border-white/20 ml-1">Date {{ deletion_date }}</span>
+                </div>
+            </details>
+
+            <!-- Warning Message -->
+            <div class="bg-rose-500/20 border-l-4 border-rose-500 rounded-r-xl px-4 py-3 mb-4">
+                <p class="text-sm text-rose-200">
+                    <span class="font-bold">⚠️ Your account and its associated data will be removed from our platform in</span>
+                    <span class="interval inline-block px-2.5 py-0.5 bg-amber-500/20 text-amber-300 rounded-full text-xs font-bold border border-amber-500/30 ml-2">--</span>
+                </p>
+                <p class="text-xs text-rose-200/70 mt-1">It may take a bit longer to remove your data from third-party services.</p>
+            </div>
+
+            <!-- Notes -->
+            <div class="space-y-2 text-sm text-gray-400 mb-4">
+                <p class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    We are obligated to delete your data within {{ policy_interval }}.
+                </p>
+                <p class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    You may 
+                    <span class="px-2 py-0.5 bg-gray-500/20 text-gray-300 rounded-full text-xs border border-gray-500/30">STOP</span>
+                    <strong class="text-white">this process</strong> by hitting the below button.
+                </p>
+            </div>
+
+            <!-- Stop Deletion Button -->
+            <button type="submit" 
+                    class="w-full group relative px-6 py-3 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-gray-500/20 transition-all duration-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 border border-white/10">
+                <span class="spinner-grow spinner-grow-sm hidden inline-block w-4 h-4 rounded-full bg-white animate-ping" role="status" aria-hidden="true"></span>
+                <span class="button-text flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    STOP Account Deletion
+                </span>
+            </button>
+
+            <script type="text/javascript">
+                /* Can't use constant NOR let
+                 * - Because declared data updates per <form> submit
+                 *
+                 * NOTE: Date() requires:
+                 * - ISO 8601 format TO include UTC dilation (timezone)
+                 */
+                countDown.date = new Date("{{ deletion_date }}")
+                countDown.elements = [...document.querySelectorAll('span.interval')];
+                document.currentScript.remove();
+            </script>
+        </div>
+
+    {% else %}
+        <!-- No Deletion Active State -->
+        <div class="bg-rose-500/5 backdrop-blur-sm rounded-2xl p-4 border border-rose-500/20">
+            <!-- Info Message -->
+            <div class="space-y-2 text-sm text-gray-400 mb-4">
+                <p class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-rose-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Your account and its associated data will not be removed immediately.
+                </p>
+                <p class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    We are obligated to delete your data within {{ policy_interval }}.
+                </p>
+                <p class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                    </svg>
+                    You may stop this process at any time within
+                    <span class="interval inline-block px-2.5 py-0.5 bg-gray-500/20 text-gray-300 rounded-full text-xs font-mono border border-gray-500/30">--</span>
+                </p>
+            </div>
+
+            <!-- Privacy Policy Links -->
+            <div class="bg-white/5 rounded-xl px-4 py-3 mb-4 border border-white/10">
+                <p class="text-xs text-gray-400">
+                    Review our
+                    <a href="#" class="text-blue-400 hover:text-blue-300 underline transition-colors">Terms</a>
+                    and
+                    <a href="#" class="text-blue-400 hover:text-blue-300 underline transition-colors">Privacy Policy</a>
+                    for details on how we handle your data.
+                </p>
+            </div>
+
+            <script type="text/javascript">
+                (() => {
+                    const script = document.currentScript;
+                    const parent = script.parentElement;
+
+                    const elements = [parent.querySelector('.interval')];
+                    const date = getFutureDate({{ DELETE_USER_INTERVAL }});
+                          date.setSeconds(date.getSeconds() + 1);
+
+                    formatCountdownElements({ elements, date });
+                    document.currentScript.remove();
+                })();
+            </script>
+
+            <!-- Delete Button -->
+            <button type="submit" 
+                    class="w-full group relative px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-rose-500/40 transition-all duration-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 overflow-hidden">
+                <span class="relative z-10 flex items-center gap-2">
+                    <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                    <span class="button-text">Delete My Account</span>
+                </span>
+                <span class="absolute inset-0 bg-gradient-to-r from-pink-500 to-rose-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span class="spinner-grow spinner-grow-sm hidden absolute right-4 w-4 h-4 rounded-full bg-white animate-ping" role="status" aria-hidden="true"></span>
+            </button>
+        </div>
+    {% endif %}
+
+    <script type="text/javascript">
+        (() => {
+            const form = document.getElementById('delete-account');
+            let button = form.querySelector('button[type="submit"]');
+            let throttle = false;
+            let timeout, fallback;
+
+            if (!button) return;
+
+            button.dataset.name = button.innerHTML.trim();
+
+            // Set loading animation for button when pressed
+            button.addEventListener('click', () => {
+                if (throttle) return;
+                throttle = true;
+
+                timeout = setTimeout(() => {
+                    setLoadingButton(button);
+                }, {{ delay }});
+
+                // Set fallback execution after 15 seconds
+                fallback = setTimeout(() => {
+                    console.warn('No response received in 15 seconds, executing fallback.');
+                    setNormalButton(button);
+                    throttle = false;
+                }, 15000);
+
+                setLoadingButton(button);
+            });
+
+            /* Clear animation once response is provided from the server
+             * NOTE: No duplicate HTMX event listeners will persist.
+             * The parent <form> holds the listener and is replaced via hx-swap-oob (outerHTML),
+             * which naturally removes the previous DOM and its associated listeners.
+             */
+            form.addEventListener('htmx:afterRequest', async (event) => {
+                let form = event.detail.target.closest('form');
+                if (form?.id != 'delete-account') return;
+
+                // Receive response from the backend
+                let xhr = event.detail.xhr;
+                let responseText = await xhr.responseText;
+
+                if (!xhr.getResponseHeader('Content-Type')?.includes('text/html')) return;
+
+                // Handle response
+                clearTimeout(timeout);
+                clearTimeout(fallback);
+                setNormalButton(button);
+                throttle = false;
+            });
+
+            document.currentScript.remove();
+        })();
+    </script>
+</form>
+{% endwith %}

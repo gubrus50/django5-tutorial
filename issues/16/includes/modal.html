@@ -1,0 +1,54 @@
+<section id="modals" hx-swap-oob="innerHTML">
+    {% with modal_path='users/modals/'|add:path|add:step|add:'.html' %}
+        {% if next %}
+            {% with post_url=post_url|add:'?next='|add:next %}
+                {% include modal_path with title=title post_url=post_url step=step page=page submit=submit submit_type=submit_type submit_boldend=submit_boldend %}
+            {% endwith %}
+        {% else %}
+            {% include modal_path with title=title post_url=post_url step=step page=page submit=submit submit_boldend=submit_boldend %}
+        {% endif %}
+    {% endwith %}
+    
+    <script type="text/javascript">
+        (() => {
+            // Find the modal in this section
+            const modal = document.currentScript.parentElement.querySelector('[id$="-modal"]');
+            if (!modal) return;
+            
+            // Clean up any leftover backdrops
+            document.querySelectorAll('.modal-backdrop')?.forEach(backdrop => backdrop.remove());
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+            
+            // Setup input validation cleanup
+            const input = modal.querySelector('input:not([type="hidden"])');
+            if (input && typeof setNormalInput === 'function') {
+                input.addEventListener('keydown', () => setNormalInput(input));
+            }
+            
+            // Setup submit button loading state
+            const btnSubmit = modal.querySelector('.modal-submit-button');
+            if (btnSubmit && typeof setLoadingButtonForModal === 'function') {
+                btnSubmit.dataset.name = btnSubmit.innerHTML.trim();
+                btnSubmit.addEventListener('click', () => setLoadingButtonForModal(btnSubmit));
+            }
+            
+            // Show the modal
+            if (typeof openModal === 'function') {
+                // Wait a tiny bit for the DOM to settle
+                setTimeout(() => {
+                    openModal(modal.id);
+                }, 50);
+            } else {
+                // Fallback
+                modal.classList.remove('hidden');
+                modal.style.visibility = 'visible';
+                modal.style.opacity = '1';
+                document.body.classList.add('overflow-hidden');
+            }
+            
+            // Clean up script tag
+            document.currentScript.remove();
+        })();
+    </script>
+</section>

@@ -1,0 +1,152 @@
+<div id="mfa-switch-container" class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-purple-500/30 {% if not no_fade %}animate-fade-in-up{% endif %}" style="animation-delay: 0.8s;">
+    <div>
+        <label for="mfa-flex-switch" class="font-medium text-white flex items-center gap-2 cursor-pointer">
+            <span class="text-xl">🔐</span>
+            Multi-Factor Authentication
+        </label>
+        {% if user.account.mfa_enabled or otp_services.email and otp_services.sms %}
+        <p class="text-sm text-gray-400">Add an extra layer of security to your account</p>
+        {% else %}
+        <p class="text-sm text-gray-400">Enabling MFA setting is currently unavailable</p>
+        {% endif %}
+    </div>
+    <div class="relative flex items-center">
+        <input type="checkbox" id="mfa-flex-switch" name="switch"
+            {% if user.account.mfa_enabled %}checked{% endif %}
+            {% if user.account.mfa_enabled or otp_services.email and otp_services.sms %}
+            hx-post="{% url 'enable_mfa' %}"
+            hx-trigger="click throttle:1s"
+            hx-swap="none"
+            {% else %}
+            disabled
+            {% endif %}
+            class="mfa-toggle-input">
+        <label for="mfa-flex-switch" class="mfa-toggle-label">
+            <div class="mfa-toggle-track">
+                <div class="mfa-toggle-thumb"></div>
+            </div>
+        </label>
+    </div>
+
+
+<style>
+/* ===== MFA TOGGLE SWITCH ===== */
+.mfa-toggle-input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.mfa-toggle-label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    /* Ensure the label is visible */
+    width: 56px;
+    height: 32px;
+}
+
+.mfa-toggle-track {
+    width: 56px;
+    height: 32px;
+    background-color: #4B5563;
+    border-radius: 9999px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 300ms;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.mfa-toggle-thumb {
+    position: absolute;
+    left: 4px;
+    top: 4px;
+    width: 24px;
+    height: 24px;
+    background-color: white;
+    border-radius: 9999px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 300ms;
+    z-index: 2;
+}
+
+/* When checked, change track color */
+.mfa-toggle-input:checked + .mfa-toggle-label .mfa-toggle-track {
+    background: linear-gradient(to right, #8B5CF6, #EC4899);
+}
+
+/* When checked, move the thumb */
+.mfa-toggle-input:checked + .mfa-toggle-label .mfa-toggle-thumb {
+    transform: translateX(24px);
+}
+</style>
+
+
+{% if user.account.mfa_enabled or otp_services.email and otp_services.sms %}
+<script name="mfa-switch" type="text/javascript">
+
+    function throttleElement(element, type='click', delay=500) {
+        element.dataset.throttle = false;
+        element.addEventListener(type, event => {
+            if (element.dataset.throttle == 'true') {
+                event.preventDefault(); return;
+            }
+            element.dataset.throttle = true;
+            setTimeout(() => element.dataset.throttle = false, delay);
+        });
+    }
+
+    var mfaSwitch = document.getElementById('mfa-flex-switch');
+
+    const onAnyClosedModal = (modalData) => {
+        if (!modalData) return;
+
+        const { step, submit, title, response } = modalData;
+
+        if (title == 'Enable MFA' || title == 'Disable MFA') {
+            // Force the checked state and trigger a change event to update the visual
+            mfaSwitch.checked = submit == 'Disable';
+            // Dispatch a change event to ensure any listeners are triggered
+            mfaSwitch.dispatchEvent(new Event('change'));
+            // Refresh MFA Switch to reflect its availability
+            if (response?.success === "Disabled MFA") refreshMFASwitch();
+        }
+    }
+
+    throttleElement(mfaSwitch, 'click', parseInt(
+        mfaSwitch.getAttribute('hx-trigger')
+        .match(/throttle:(\d+(s|ms))/)[1]
+        .replaceAll('ms', '')
+        .replaceAll('s', '000')
+    ));
+
+    mfaSwitch.addEventListener('change', function(e) {
+        // The peer-checked classes will automatically handle the visual
+        // This just ensures any additional logic fires
+        console.log('MFA toggled:', this.checked);
+    });
+    
+    mfaSwitch.classList.add('sr-only', 'peer');
+
+
+    // Refresh function for after MFA operations
+    function refreshMFASwitch() {
+        if (typeof htmx !== 'undefined') {
+            htmx.ajax('GET', "{% url 'mfa_switch' %}", {
+                target: '#mfa-switch-container',
+                swap: 'outerHTML'
+            });
+        }
+    };
+
+
+    document.currentScript.remove();
+</script>
+
+
+{% endif %}
+</div>

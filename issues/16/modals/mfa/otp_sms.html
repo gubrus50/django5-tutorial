@@ -1,0 +1,34 @@
+{% extends 'users/modals/base.html' %}
+{% load custom_filters %}
+{% load static %}
+
+
+{% block body %}
+    <p id="{{ step|replace:'_|-' }}-instructions" class="text-sm text-gray-300 text-center mb-3">
+        Enter the one-time password<br>(OTP) sent to your mobile via text:<br>
+        <strong class="phone-number text-purple-400 font-medium tracking-wide inline-block my-2 px-3 py-1 bg-white/5 rounded-lg border border-white/10">
+            {% if submit == 'Login' %}{{ phone_number }}{% else %}{{ request.user.account.phone_number }}{% endif %}
+        </strong>
+        {% if submit != 'Login' %}
+            <br>to finalize <strong>Multi-Factor Authentication</strong>
+        {% endif %}
+    </p>
+    {% if submit == 'Login' %}
+        <hr class="my-2">
+        {% include 'users/modals/components/mfa_return.html' %}
+    {% endif %}
+    {% url 'request_otp' 'sms' as url_request_otp %}
+    {% include 'users/modals/components/resend_otp.html' with post_url=url_request_otp image_name='mail_to_phone.png' image_path='users/img/mail_to_phone.png' %}
+{% endblock %}
+
+
+{% if submit == 'Login' %}
+    {% block form %}
+        {% include 'users/modals/mfa/data/session_copy.html' %}
+    {% endblock %}
+{% endif %}
+
+
+{% block input %}
+    {% include 'users/modals/components/main_input.html' with name='otp_code' label='OTP' aria_label='one-time-password' %}
+{% endblock %}

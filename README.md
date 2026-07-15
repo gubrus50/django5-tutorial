@@ -318,3 +318,10 @@ More features are found within the documentation.
     <td width="50%"><img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/contactFormView.png"></td>
   </tr>
 </table>
+
+<br>
+
+## Advanced MFA verification + Dynamic form rendering
+* Refer to [Issue #16](https://github.com/gubrus50/django5-tutorial/issues/16) for context.
+* [Resources](https://github.com/gubrus50/django5-tutorial/tree/main/issues/16) 
+<img src="https://github.com/gubrus50/django5-tutorial/blob/main/screenshots/issues/16/mfa_switch_enabled.png">

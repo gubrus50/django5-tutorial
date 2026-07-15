@@ -39,6 +39,7 @@ and follow the instructions inside.
 7. [Payments](#payments)<br>
 8. [Errors](#errors)<br>
 9. [Contacting Support](#contacting-support)<br>
+10. [Advanced MFA applications](#advanced-mfa-verification--dynamic-form-rendering)<br>
 
 More features are found within the documentation. 
 

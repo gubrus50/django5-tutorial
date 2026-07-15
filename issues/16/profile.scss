@@ -1,0 +1,326 @@
+/* ===== OTHER ANIMATIONS ===== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-down {
+    animation: fadeDown 0.8s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-up {
+    animation: fadeUp 0.8s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes scaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.animate-scale-up {
+    animation: scaleUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+}
+
+@keyframes slowZoom {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.animate-slow-zoom {
+    animation: slowZoom 20s ease-in-out infinite;
+}
+
+@keyframes slowZoomReverse {
+    0% { transform: scale(1.05); }
+    50% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+}
+
+.animate-slow-zoom-reverse {
+    animation: slowZoomReverse 20s ease-in-out infinite;
+}
+
+@keyframes pulseSlow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+.animate-pulse-slow {
+    animation: pulseSlow 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.animate-shimmer {
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 4s ease-in-out infinite;
+}
+
+/* Particles */
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(2px);
+    animation: floatParticle linear infinite;
+}
+
+.particle-1 { width: 8px; height: 8px; top: 10%; left: 10%; animation-duration: 25s; animation-delay: 0s; }
+.particle-2 { width: 12px; height: 12px; top: 20%; right: 15%; animation-duration: 30s; animation-delay: 2s; }
+.particle-3 { width: 6px; height: 6px; bottom: 30%; left: 20%; animation-duration: 20s; animation-delay: 4s; }
+.particle-4 { width: 10px; height: 10px; bottom: 20%; right: 10%; animation-duration: 28s; animation-delay: 1s; }
+.particle-5 { width: 7px; height: 7px; top: 40%; left: 5%; animation-duration: 22s; animation-delay: 3s; }
+.particle-6 { width: 9px; height: 9px; top: 60%; right: 5%; animation-duration: 26s; animation-delay: 5s; }
+.particle-7 { width: 5px; height: 5px; top: 80%; left: 15%; animation-duration: 24s; animation-delay: 2s; }
+.particle-8 { width: 11px; height: 11px; top: 15%; left: 50%; animation-duration: 32s; animation-delay: 4s; }
+
+@keyframes floatParticle {
+    0% { transform: translate(0, 0) scale(1); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translate(var(--tx, 100px), var(--ty, -200px)) scale(0); opacity: 0; }
+}
+
+.particle-1 { --tx: 150px; --ty: -300px; }
+.particle-2 { --tx: -200px; --ty: -250px; }
+.particle-3 { --tx: 180px; --ty: -350px; }
+.particle-4 { --tx: -150px; --ty: -280px; }
+.particle-5 { --tx: 200px; --ty: -320px; }
+.particle-6 { --tx: -180px; --ty: -270px; }
+.particle-7 { --tx: 120px; --ty: -350px; }
+.particle-8 { --tx: -220px; --ty: -300px; }
+
+/* ===== CLEAN IMAGE UPLOAD - BUTTON STYLE ===== */
+.image-upload-wrapper {
+    @apply w-full max-w-md mx-auto;
+}
+
+.image-upload-label {
+    @apply block relative cursor-pointer;
+}
+
+.image-upload-btn {
+    @apply flex flex-col items-center justify-center gap-2 p-6 rounded-2xl border-2 border-dashed border-white/20 hover:border-purple-400/50 transition-all duration-300 bg-white/5 backdrop-blur-sm hover:bg-white/10 hover:shadow-lg hover:shadow-purple-500/20 hover:scale-[1.02] active:scale-95;
+}
+
+.image-upload-btn svg {
+    @apply transition-all duration-300;
+}
+
+.image-upload-btn:hover svg {
+    @apply scale-110 text-purple-300;
+}
+
+#id_image {
+    @apply hidden;
+}
+
+/* ===== FORM INPUT STYLING ===== */
+
+/* Target inputs inside crispy's div_id_* containers */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+    @apply w-full px-4 py-3 bg-white text-gray-800 placeholder-gray-400 rounded-xl border border-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent hover:border-purple-300;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+textarea:focus,
+select:focus {
+    @apply shadow-lg shadow-purple-500/20;
+}
+
+select {
+    @apply appearance-none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+}
+
+select option {
+    @apply bg-white text-gray-800;
+}
+
+textarea {
+    @apply resize-y min-h-[100px];
+}
+
+input[type="checkbox"], 
+input[type="radio"] {
+    @apply w-5 h-5 accent-purple-500;
+}
+
+/* ===== CRISPY FORM STYLES ===== */
+
+/* Labels - override crispy's defaults */
+[id^="div_id_"] label {
+    @apply block text-sm font-medium text-gray-200 mb-1.5 tracking-wide;
+}
+
+/* Asterisk field - make it pink */
+.asteriskField {
+    @apply text-pink-400 ml-0.5;
+}
+
+/* Crispy's default container for each field */
+[id^="div_id_"] {
+    @apply mb-4;
+}
+
+/* Help text - crispy uses small with id_*_helptext */
+[id$="_helptext"] {
+    @apply text-xs text-gray-400 mt-1 block;
+}
+
+/* Error messages */
+[id^="error_"] {
+    @apply text-xs text-pink-400 mt-1;
+}
+
+/* Error state on input */
+.has-error input,
+.has-error textarea,
+.has-error select {
+    @apply border-rose-500/50 bg-rose-50 focus:border-rose-500 focus:ring-rose-500/20;
+}
+
+/* General crispy error list */
+.errorlist {
+    @apply list-none p-0 mt-1;
+}
+
+.errorlist li {
+    @apply text-pink-400 text-sm;
+}
+
+/* Help block (crispy's default) */
+.help-block,
+.help-text,
+.helptext {
+    @apply text-xs text-gray-400 mt-1;
+}
+
+/* ===== FORM GROUP STYLING ===== */
+
+.form-group {
+    @apply mb-5;
+}
+
+/* ===== CRISPY'S DEFAULT CLASSES OVERRIDES ===== */
+
+/* Crispy adds these classes to inputs - override them */
+.textinput,
+.emailinput,
+.passwordinput,
+.numberinput,
+.phoneinput {
+    @apply w-full px-4 py-3 bg-white text-gray-800 placeholder-gray-400 rounded-xl border border-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent hover:border-purple-300;
+}
+
+/* Crispy adds border-gray-300 by default - keep it */
+.textinput.border-gray-300,
+.emailinput.border-gray-300,
+.passwordinput.border-gray-300 {
+    @apply border-gray-300;
+}
+
+/* Override crispy's focus:outline-none that might conflict */
+input:focus,
+textarea:focus,
+select:focus {
+    @apply outline-none;
+}
+
+/* ===== SPECIFIC FIELD OVERRIDES ===== */
+
+/* Phone number field - keep regionalphonenumberwidget class but add our styles */
+.regionalphonenumberwidget {
+    @apply w-full px-4 py-3 bg-white text-gray-800 placeholder-gray-400 rounded-xl border border-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent hover:border-purple-300;
+}
+
+/* Confirm password field - error state */
+#div_id_confirm_password input {
+    @apply border-red-500/50 bg-red-50/10;
+}
+
+#div_id_confirm_password input:focus {
+    @apply border-red-500 ring-red-500/20 shadow-lg shadow-red-500/20;
+}
+
+/* ===== GROUP CONTAINER ===== */
+
+.group {
+    @apply transition-all duration-300;
+}

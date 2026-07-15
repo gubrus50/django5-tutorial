@@ -123,19 +123,15 @@
     
     <!-- Login Flow Instructions -->
     {% if submit == 'Login' %}
-        <div class="mt-4">
-            <div class="bg-white/5 rounded-lg p-4 border border-white/10">
-                <div class="flex items-center gap-2 mb-3">
-                    <div class="inline-flex items-center gap-2 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
-                        <span class="w-1 h-1 bg-purple-400 rounded-full animate-pulse"></span>
-                    </div>
-                    <h6 class="text-sm font-semibold text-white">Instructions</h6>
-                </div>
-                <ol class="list-decimal list-inside space-y-1.5 text-gray-300 text-sm">
-                    <li>Open your authentication app.</li>
-                    <li>Locate the OTP for your account.</li>
-                    <li>Enter the OTP in the verification field.</li>
-                </ol>
+        <div>    
+            <!-- Instruction -->
+            <div class="flex flex-col sm:flex-row items-center gap-4 p-4 bg-white/5 rounded-lg border border-white/10 mb-2">
+                <p class="flex-1 text-sm text-white/80 text-center sm:text-left">
+                    Provide a <strong class="text-white font-semibold ml-1">One Time Password</strong>
+                </p>
+                <p class="flex-1 text-sm text-white/50 text-center sm:text-left">
+                    from your Authenticator app
+                </p>
             </div>
             {% include 'users/modals/components/mfa_options.html' %}
         </div>

@@ -173,16 +173,24 @@
         
 
         function TREDSecondsLeft() {
+            /* TRED = Throttle Request Expiry-Date
+            /
+            / Get the expiry date cookie. Notes:
+            /   - cookie's date format should be that of: ISO 8601
+            /   - up-to-date cookie should be provided with each response
+            /   - cookie should be initially provided with this <component>
+            */
             const cookie = getCookie('throttle_otp_request_expiry_date');
-            
+            // Parse the date if cookie exists
             const expiryDate = cookie ? new Date(cookie) : null;
-            
+
+            // Validate the date and calculate remaining seconds
             if (expiryDate && !isNaN(expiryDate.getTime())) {
                 const now = new Date();
                 const secondsLeft = Math.floor((expiryDate - now) / 1000) + 1;
-                return secondsLeft > 0 ? secondsLeft : 0;
+                return secondsLeft > 0 ? secondsLeft : 0; // Return 0 if expired
             }
-            
+            // Return null if no valid expiry date found
             return null;
         }
 
@@ -192,7 +200,11 @@
             e.stopPropagation();
 
             if (count > 0) return;
-
+            /* Request new OTP code AND send it TO:
+            /   - user's contact method = email|sms (specified in the post_url)
+            /
+            /  https://htmx.org/api/#ajax
+            */
             htmx.ajax('POST', '{{ post_url }}', {
                 swap: 'none',
                 headers: {
@@ -223,9 +235,10 @@
 
             isIntervalActive = true;
             if (interval) clearInterval(interval);
-            countDown();
+            countDown(); // Immediately show the count
             interval = setInterval(countDown, 1000);
-            
+
+            // Show spinner when throttling starts (count > 0)
             spinner.classList.remove('sr-only');
             buttonTxt.classList.add('sr-only');
         }
@@ -244,6 +257,7 @@
             }
             else return;
 
+            // Cancel the timeout & fallback execution if server response is received
             clearTimeout(timeout);
             clearTimeout(fallback);
 

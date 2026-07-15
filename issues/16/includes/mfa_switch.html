@@ -1,5 +1,5 @@
-<div id="mfa-switch-container" class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-purple-500/30 {% if not no_fade %}animate-fade-in-up{% endif %}" style="animation-delay: 0.8s;">
-    <div>
+<div id="mfa-switch-container" class="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 transition-all duration-300 hover:bg-white/10 hover:border-purple-500/30 {% if not no_fade %}animate-fade-in-up{% endif %}" style="animation-delay: calc({{ fadein_delay }}s / 10);">
+    <div class="AView-4">
         <label for="mfa-flex-switch" class="font-medium text-white flex items-center gap-2 cursor-pointer">
             <span class="text-xl">🔐</span>
             Multi-Factor Authentication
@@ -102,10 +102,23 @@
 
     var mfaSwitch = document.getElementById('mfa-flex-switch');
 
-    const onAnyClosedModal = (modalData) => {
-        if (!modalData) return;
+    document.addEventListener('modal:closed', async (event) => {
+        if (!event.detail.modalData) return;
 
-        const { step, submit, title, response } = modalData;
+        let xhr = event.detail.xhr;
+        let responseText = await xhr.responseText;
+        let response = '';
+
+        if (xhr.getResponseHeader('Content-Type')?.includes('application/json')) {
+            try {
+                response = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Failed to parse JSON response', e);
+                return;
+            }
+        }
+
+        const { step, submit, title } = event.detail.modalData;
 
         if (title == 'Enable MFA' || title == 'Disable MFA') {
             // Force the checked state and trigger a change event to update the visual
@@ -113,9 +126,9 @@
             // Dispatch a change event to ensure any listeners are triggered
             mfaSwitch.dispatchEvent(new Event('change'));
             // Refresh MFA Switch to reflect its availability
-            if (response?.success === "Disabled MFA") refreshMFASwitch();
+            if (response?.success === 'Disabled MFA') refreshMFASwitch();
         }
-    }
+    });
 
     throttleElement(mfaSwitch, 'click', parseInt(
         mfaSwitch.getAttribute('hx-trigger')

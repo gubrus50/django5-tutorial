@@ -1,14 +1,37 @@
-<form id="mfa-alternative-options" class="d-flex justify-content-between align-items-center"
+<form id="mfa-alternative-options"
     action="{% url 'request_mfa' 'none' %}"
     enctype="multipart/form-data"
-    method="POST">
+    method="POST"
+    class="w-full max-w-lg mx-auto px-4 sm:px-0"
+>
+
     {% include 'users/modals/mfa/data/in_circulation.html' %}
 
-    <p class="w-50 me-2">Return back to try and login with your authentication app</p>
-    <button class="btn btn-outline-primary w-50" type="button"
-        hx-post="{% url 'request_mfa' 'otp_qrcode' %}"
-        hx-trigger="click throttle:1s"
-        hx-swap="none">
-        Authenticate<br>via app
-    </button>
+    <!-- Available State -->
+    <div class="space-y-3 sm:space-y-4 mb-5">
+        <div class="flex items-center gap-3 justify-center">
+            <p class="text-sm sm:text-base text-white/60 text-center">
+                Return
+            </p>
+            <span class="flex-1 max-w-16 h-px bg-white/20"></span>
+        </div>
+        <!-- Return button -->
+        <button type="button"
+            class="relative group w-full px-6 sm:px-8 py-4 sm:py-4.5 bg-gradient-to-r from-purple-500/10 to-purple-600/10 hover:from-purple-500/20 hover:to-purple-600/20 text-white text-sm sm:text-base font-medium rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/10 hover:shadow-purple-500/20"
+            hx-post="{% url 'request_mfa' 'otp_qrcode' %}"
+            hx-trigger="click throttle:1s"
+            hx-swap="none">
+            
+            <span class="relative flex items-center justify-center gap-2">
+                <!-- Auth App Icon -->
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+                <span class="font-semibold text-white">Authenticate via app</span>
+            </span>
+            
+            <!-- Hover Glow Effect -->
+            <span class="absolute inset-0 -z-10 bg-gradient-to-r from-purple-500/0 via-purple-500/10 to-purple-500/0 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity duration-500"></span>
+        </button>
+    </div>
 </form>

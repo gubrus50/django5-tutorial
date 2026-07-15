@@ -1,0 +1,12 @@
+{% load custom_filters %}
+{% load tailwind_filters %}
+<div id="field-{{ field.name|replace:'_|-' }}" hx-swap-oob="outerHTML" class="group {% if not no_fadein %}animate-fade-in-up{% endif %}" style="animation-delay: calc({{ fadein_delay }}s / 10);">
+    {% if field.name == 'phone_number' and not otp_services.sms or field.name == 'email' and not otp_services.email %}
+        {{ field|del_attr:'required'|add_attr:'readonly'|as_crispy_field }}
+        <small id="id_{{ field.name }}_helptext" class="text-gray-600" style="margin-top: -10px">
+            {{ field.label }} update actions are disabled until verification services are restored.
+        </small>
+    {% else %}
+        {{ field|as_crispy_field }}
+    {% endif %}
+</div>

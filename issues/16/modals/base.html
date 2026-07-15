@@ -98,57 +98,113 @@
                     <h5 class="text-lg font-semibold text-white" id="{{ step_keb }}-label">{{ title }}</h5>
                 </div>
                 <span class="text-sm text-white/50 font-mono tracking-wider">{{ page }}</span>
-                <button type="button" 
+                <button type="button" name="action" value="close" style="pointer-events: auto;"
                         class="text-white/40 hover:text-white hover:bg-white/10 rounded-lg p-2 transition-all duration-300 hover:scale-110 active:scale-90"
                         data-modal-close
                         aria-label="Close"
-                        style="pointer-events: auto;">
+                        hx-post="{{ post_url }}"
+                        hx-vals='{"csrfmiddlewaretoken": "{{ csrf_token }}", "step": "{{ step }}"}'
+                        hx-trigger="click throttle:1s"
+                        hx-swap="none">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
                 
-                {# SERIALIZE on_delete_data #}
+                {# SERIALIZE modal_data #}
 
-                {% if on_delete_data %}
-                    {{ on_delete_data|json_script:'modals-on-delete-data' }}
+                {% if modal_data %}
+                    {{ modal_data|json_script:'modal-data' }}
                 {% else %}
-                    <script id="modals-on-delete-data" type="application/json">null</script>
+                    <script id="modal-data" type="application/json">null</script>
                 {% endif %}
 
                 <script type="text/javascript">
-                    /* Declare the onAnyClosedModal() on a global scope
-                    /
-                    /  if it hasn't been already to remove annoying
-                    /  error message: onAnyClosedModal is not defined
-                    / 
-                    /  This function is optional, it does not have to be declared
+                    /* <button name="action" value="close"> (linked with Escape key from keyboard)
+                    /  triggers:
+                    /   - eventListener 'modal:close'
+                    /  provides:
+                    /   - event.detail.xhr       <- awaits for HTMX afterRequest XHR response
+                    /   - event.detail.modalData <- serialized context['modal_data'] from BackEnd      
                     */
-                    if (typeof window.onAnyClosedModal === 'undefined') {
-                        window.onAnyClosedModal = () => {};
-                    }
-
                     (() => {
                         const header = document.currentScript.parentElement;
                         const closeBtn = header.querySelector('[data-modal-close]');
+                        const scriptTag = document.getElementById('modal-data');
 
-                        const scriptTag = document.getElementById('modals-on-delete-data');
+
                         let parsedData = null;
-
                         try {
                             parsedData = JSON.parse(scriptTag.textContent);
                         } catch (error) {
-                            console.warn('modals/base.html - Failed to parse on_delete_data JSON', error);
+                            console.warn('modals/base.html - Failed to parse modal_data JSON', error);
                         }
 
-                        closeBtn?.addEventListener("click", function (e) {
+
+                        const escapeHandler = function (e) {
+                            if (e.key === 'Escape') closeBtn?.click();
+                        };
+
+                        window.addEventListener('keyup', escapeHandler);
+
+
+                        const modalClosed = (e, xhr = null) => {
+                            const modalElement = document.getElementById("{{ modal_id }}");
+                            
+                            const event = new CustomEvent('modal:closed', {
+                                detail: {
+                                    modal: modalElement,
+                                    modalData: parsedData,
+                                    xhr: xhr,
+                                    triggerElement: e?.target || null,
+                                    closeEvent: e || null,
+                                }
+                            });
+                            document.dispatchEvent(event);
+                        };
+
+
+                        closeBtn?.addEventListener('click', function (e) {
                             e.preventDefault();
-                            onAnyClosedModal(parsedData);
-                            if (typeof closeModal === 'function') {
-                                const modal = header.closest('[id$="-modal"]');
-                                closeModal(modal);
-                            }
+
+                            // Create a promise that resolves when HTMX request completes
+                            const hxPromise = new Promise((resolve) => {
+                                // Listen for HTMX afterRequest on this button
+                                const onAfterRequest = (event) => {
+                                    if (event.detail.elt === closeBtn) {
+                                        const xhr = event.detail.xhr || null;
+                                        resolve(xhr);
+                                        closeBtn.removeEventListener('htmx:afterRequest', onAfterRequest);
+                                    }
+                                };
+                                
+                                closeBtn.addEventListener('htmx:afterRequest', onAfterRequest);
+                                
+                                // Timeout fallback (5 seconds)
+                                setTimeout(() => {
+                                    closeBtn.removeEventListener('htmx:afterRequest', onAfterRequest);
+                                    resolve(null);
+                                }, 5000);
+                            });
+
+
+                            // Wait for HTMX to complete
+                            hxPromise.then((xhr) => {
+
+                                // Clean up the escape handler
+                                window.removeEventListener('keyup', escapeHandler);
+
+                                // Close modal
+                                if (typeof closeModal === 'function') {
+                                    const modal = header.closest('[id$="-modal"]');
+                                    closeModal(modal);
+                                }
+
+                                // Forward the event with XHR
+                                modalClosed(e, xhr);
+                            });
                         });
+
                     })();
                 </script>
             </div>
@@ -174,7 +230,7 @@
                     {% block input %}{% endblock %}
                     <input type="hidden" name="step" value="{{ step }}">
                 </div>
-                <button type="submit" 
+                <button type="submit" name="action" value="submit" style="pointer-events: auto;"
                         class="w-full px-4 py-3 text-white rounded-xl transition-all duration-300 font-medium
                                bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 
                                hover:from-purple-700 hover:via-indigo-700 hover:to-pink-700
@@ -184,8 +240,7 @@
                                modal-submit-button"
                         hx-post="{{ post_url }}"
                         hx-trigger="click delay:1000ms"
-                        hx-swap="none"
-                        style="pointer-events: auto;">
+                        hx-swap="none">
                     <span class="spinner-border inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin hidden sr-only" 
                           role="status" 
                           aria-hidden="true"></span>

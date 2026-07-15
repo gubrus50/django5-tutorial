@@ -190,6 +190,7 @@ document.addEventListener('htmx:afterRequest', async (event) => {
         console.log('Resend OTP path, skipping form handler');
         return;
     }
+
     
     const form = event.detail.target.closest('form');
     if (!form?.classList.contains('modal-footer')) return;
@@ -248,19 +249,8 @@ document.addEventListener('htmx:afterRequest', async (event) => {
         }
     }
 
-    if (response.success) {
-
-        // Risky (take required data directly from modal)
-        // Vulnerable to modal's base design changes
-        const step = modal.querySelector('.modal-footer input[name="step"]')?.value;
-        const title = modal.querySelector('[id$="-label"]')?.innerText;
-        const submit = modal.querySelector('.modal-footer button[type="submit"] .button-text')?.childNodes[0]?.textContent.trim();
-        
-        // Calls closeModal() for each modal -> Removes modal from DOM
-        hideModals();
-        onAnyClosedModal({ step, title, submit, response });
-
-    } else if (/Invalid OTP|Invalid password/g.test(response.error)) {
+    if (response.success) { hideModals(); }
+    else if (/Invalid OTP|Invalid password/g.test(response.error)) {
         let input = form.querySelector('input:not([type="hidden"])');
         if (input) {
             setInvalidInput(input);
@@ -272,24 +262,12 @@ document.addEventListener('htmx:afterRequest', async (event) => {
     }
 });
 
-// ============== Keyboard Support ==============
-
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        document.querySelectorAll('[id$="-modal"]:not(.hidden)').forEach(modal => {
-            closeModal(modal);
-        });
-    }
-});
-
 // ============== Click Outside Support - BOUNCE INSTEAD OF CLOSE ==============
 
 document.addEventListener('click', function(e) {
     if (e.target.hasAttribute('data-modal-backdrop')) {
         const modal = e.target.closest('[id$="-modal"]');
-        if (modal) {
-            bounceModal(modal);
-        }
+        if (modal) bounceModal(modal);
     }
 });
 
@@ -365,6 +343,68 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('[id$="-modal"]').forEach(modal => {
         if (!modal.classList.contains('hidden')) {
             modal.classList.add('hidden');
+        }
+    });
+
+    document.addEventListener('modal:closed', async (event) => {
+        if (!event.detail.modalData) return;
+
+        let xhr = event.detail.xhr;
+        let responseText = await xhr.responseText;
+        let response = '';
+
+        if (xhr.getResponseHeader('Content-Type')?.includes('application/json')) {
+            try {
+                response = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Failed to parse JSON response', e);
+                return;
+            }
+        }
+        
+        // Log the error to the console
+        if (response.error)
+             console.error(response.error, response);
+        else console.log(response);
+
+
+        // Early return for highlighting unverified fields.
+        if (response.error != 'Unverified fields') return;
+        const fields = response?.unverified_fields; if (!fields) return;
+        // Every <input> has a unique identifier.
+        // Hence, there should be one element with unique ID per template/page.
+        for (fieldName of fields) {
+
+            let field = document.querySelector(`input[id="id_${fieldName}"]`);
+            // Skip if field already has unverified-field error message
+            if (field.parentElement.querySelector('p[data-unverified-field]')) continue;
+
+
+            let errCount = field.parentElement.querySelectorAll('p[id^=error]').length + 1;
+
+            // Highlight field as invalid
+            removeMatchingClasses(field, /^border-\w+-\d+$/); // utilities.js
+            field.setAttribute('aria-invalid', true);
+            field.classList.add('border-red-500');
+
+            // Apply error message for unverified field
+            let error = document.createElement('p'),
+                text = document.createElement('strong');
+            
+            text.innerText = 'Unverified field. This field must pass OTP verification.';
+            error.classList.add('text-red-500', 'text-xs', 'italic');
+
+            error.id = `error_${errCount}_id_${fieldName}`;
+            error.dataset.unverifiedField = '';
+            error.append(text);
+            field.parentElement.append(error);
+
+
+            // Reset confirm password field
+            document.querySelector('input[id="id_confirm_password"]').value = '';
+            
+            // library AView.js (show error and other hidden AV in-view elements)
+            if (AV) AV.load('run');
         }
     });
 });

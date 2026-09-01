@@ -1,0 +1,185 @@
+{% load static %}
+
+<div id="{{ hx_target_id }}" hx-swap-oob="outerHTML">
+
+<style>
+
+#payment-form * {
+    font-family: "Helvetica Neue", Helvetica, sans-serif; 
+}
+.stripe-agreement a {
+    color: #FFF;
+    text-decoration: none;
+}
+.stripe-agreement a:hover {
+    text-decoration: underline;
+}
+.stripe-agreement p {
+    margin: 0;
+}
+
+</style>
+
+
+<section id="payment">
+
+    <div id="card-element" class="p-3 border border-white/10 rounded-xl">
+        <!-- Elements will create form elements here -->
+    </div>
+
+    <section class="stripe-agreement my-3 bg-white/5 rounded-xl p-4 text-white/70 text-sm">
+        <p>
+            Powered by 
+            <a href="https://stripe.com" target="_blank">Stripe</a>.
+            By proceeding, you agree to 
+            <a href="https://stripe.com/legal" target="_blank">Terms of Service</a>
+            and 
+            <a href="https://stripe.com/privacy" target="_blank">Privacy Policy</a>.
+        </p>
+    </section>
+
+    <div class="flex w-full gap-3">
+        <button id="pay-button" type="submit" name="action" value="pay"
+            class="relative w-full px-6 py-3.5 
+                bg-gradient-to-r from-indigo-500 to-indigo-600
+                hover:from-indigo-600 hover:to-indigo-700
+                text-white text-sm font-semibold rounded-xl shadow-lg
+                hover:scale-[1.02] transition-all duration-300 active:scale-95
+                flex items-center justify-center gap-2
+                disabled:brightness-75 disabled:cursor-not-allowed">
+            <svg role="status" aria-hidden="true" class="loading-indicator w-4 h-4 inline-block w-5 h-5 hidden sr-only" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                <title xmlns="">gooey-balls-2</title><defs><filter id="SVGp0LL3caJ"><feGaussianBlur in="SourceGraphic" result="y" stdDeviation="1"/><feColorMatrix in="y" result="z" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -7"/><feBlend in="SourceGraphic" in2="z"/></filter></defs><g filter="url(#SVGp0LL3caJ)"><circle cx="5" cy="12" r="4" fill="currentColor"><animate attributeName="cx" calcMode="spline" dur="2s" keySplines=".36,.62,.43,.99;.79,0,.58,.57" repeatCount="indefinite" values="5;8;5"/></circle><circle cx="19" cy="12" r="4" fill="currentColor"><animate attributeName="cx" calcMode="spline" dur="2s" keySplines=".36,.62,.43,.99;.79,0,.58,.57" repeatCount="indefinite" values="19;16;19"/></circle><animateTransform attributeName="transform" dur="0.75s" repeatCount="indefinite" type="rotate" values="0 12 12;360 12 12"/></g>
+            </svg>
+            <svg class="icon w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20">
+                <title xmlns="">banknotes-20-solid</title><path fill="currentColor" fill-rule="evenodd" d="M1 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm12 4a3 3 0 1 1-6 0a3 3 0 0 1 6 0M4 9a1 1 0 1 0 0-2a1 1 0 0 0 0 2m13-1a1 1 0 1 1-2 0a1 1 0 0 1 2 0M1.75 14.5a.75.75 0 0 0 0 1.5c4.417 0 8.693.603 12.749 1.73c1.111.309 2.251-.512 2.251-1.696v-.784a.75.75 0 0 0-1.5 0v.784a.272.272 0 0 1-.35.25A49 49 0 0 0 1.75 14.5" clip-rule="evenodd"/>
+            </svg>
+            <span>Proceed with payment</span>
+        </button>
+
+        <button id="pay-button" type="submit" name="action" value="cancel-pay"
+            class="relative w-full px-6 py-3.5 bg-gradient-to-r 
+                from-purple-500 to-pink-500 hover:from-purple-600 
+                hover:to-pink-600 text-white text-sm font-semibold 
+                rounded-xl shadow-lg hover:scale-[1.02] transition-all 
+                duration-300 active:scale-95 flex items-center justify-center 
+                gap-2 disabled:brightness-75 disabled:cursor-not-allowed">
+            <svg role="status" aria-hidden="true" class="loading-indicator w-4 h-4 inline-block w-5 h-5 hidden sr-only" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                <title xmlns="">gooey-balls-1</title><defs><filter id="SVGg4wYRcsm"><feGaussianBlur in="SourceGraphic" result="y" stdDeviation="1.5"/><feColorMatrix in="y" result="z" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 18 -7"/><feBlend in="SourceGraphic" in2="z"/></filter></defs><g fill="currentColor" filter="url(#SVGg4wYRcsm)"><circle cx="4" cy="12" r="3"><animate attributeName="cx" calcMode="spline" dur="0.75s" keySplines=".56,.52,.17,.98;.56,.52,.17,.98" repeatCount="indefinite" values="4;9;4"/><animate attributeName="r" calcMode="spline" dur="0.75s" keySplines=".56,.52,.17,.98;.56,.52,.17,.98" repeatCount="indefinite" values="3;8;3"/></circle><circle cx="15" cy="12" r="8"><animate attributeName="cx" calcMode="spline" dur="0.75s" keySplines=".56,.52,.17,.98;.56,.52,.17,.98" repeatCount="indefinite" values="15;20;15"/><animate attributeName="r" calcMode="spline" dur="0.75s" keySplines=".56,.52,.17,.98;.56,.52,.17,.98" repeatCount="indefinite" values="8;3;8"/></circle></g>
+            </svg>
+            <svg class="icon w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                <title xmlns="">pane-close-24-filled</title><path fill="currentColor" d="M9.193 9.248a.75.75 0 0 1 1.059-.055l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75a.75.75 0 0 1 0-1.5h3.546l-1.048-.943a.75.75 0 0 1-.055-1.059M22 17.25A2.75 2.75 0 0 1 19.25 20H4.75A2.75 2.75 0 0 1 2 17.25V6.75A2.75 2.75 0 0 1 4.75 4h14.5A2.75 2.75 0 0 1 22 6.75zm-6.998 1.25v-13H4.75c-.69 0-1.25.56-1.25 1.25v10.5c0 .69.56 1.25 1.25 1.25z"/>
+            </svg>
+            <span>Cancel</span>
+        </button>
+    </div>
+
+
+
+
+
+    <div id="card-errors" role="alert" class="text-danger">
+        <!-- Display error message to your customers here -->
+    </div>
+    
+</section>
+
+
+<script name="stripe-payment-form" type="text/javascript">
+(() => {
+
+// Initialize Stripe with your publishable key
+const stripe = Stripe('{{ stripe_public }}');
+// Create an instance of Elements
+const elements = stripe.elements();
+
+// Options for customizing the Card Element styles
+const style = {
+    base: {
+        color: '#FFF',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '20px',
+        '::placeholder': {
+            color: '#aab7c4',
+        },
+    },
+    invalid: {
+        color: '#fa755a',
+        iconColor: '#fa755a',
+    },
+};
+
+// Create an instance of the Card Element
+const card = elements.create('card', { style });
+// Add the Card Element to the page
+card.mount('#card-element');
+
+
+
+
+
+
+
+const form = document.getElementById("{{ target_form_id }}");
+const eltError = document.getElementById('card-errors');
+
+
+
+// Handle real-time validation errors
+card.on('change', (event) => {
+    eltError.textContent = (event.error) ? event.error.message : "";
+});
+
+
+
+const submitPayment = async (event) => {
+
+    const submitter = event?.detail?.requestConfig?.triggeringEvent?.submitter;
+
+    // GET server response: XHR, IF triggerEvent IS this btn. ELSE return
+    if (submitter?.id != 'pay-button') return;
+    
+    xhr = event.detail.xhr;
+    if (xhr.status < 200 || xhr.status >= 300) return;
+    const contentType = xhr.getResponseHeader('Content-Type') || '';
+    if (!contentType.includes('application/json')) return;
+
+    const data = JSON.parse(xhr.responseText),
+    clientSecret = data.client_secret;
+
+    // Confirm the card payment
+    const { error } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+            card: card,
+        },
+    });
+
+    if (error) {
+        // Handle errors from the stripe card payment
+        eltError.textContent = error.message;
+    } else {
+        paymentSuccess();
+    }
+
+}
+
+function paymentSuccess() {
+
+    card.clear();
+    form.reset();
+    form.removeEventListener('htmx:afterRequest', submitPayment);
+
+    {% if success_url %}
+        window.location.href = "{{ success_url }}";
+    {% endif %}
+
+}
+
+
+// Handle form submission
+form.addEventListener('htmx:afterRequest', submitPayment);
+document.currentScript.remove();
+
+})();
+</script>
+</div>

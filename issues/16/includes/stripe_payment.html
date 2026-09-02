@@ -2,7 +2,7 @@
 
 <div id="{{ hx_target_id }}" hx-swap-oob="outerHTML">
 
-<style>
+<style name="payment-intent">
 
 #payment-form * {
     font-family: "Helvetica Neue", Helvetica, sans-serif; 
@@ -39,8 +39,8 @@
     </section>
 
     <div class="flex w-full gap-3">
-        <button id="pay-button" type="submit" name="action" value="pay"
-            class="relative w-full px-6 py-3.5 
+        <button type="submit" name="action" value="pay"
+            class="payment-intent-button relative w-full px-6 py-3.5 
                 bg-gradient-to-r from-indigo-500 to-indigo-600
                 hover:from-indigo-600 hover:to-indigo-700
                 text-white text-sm font-semibold rounded-xl shadow-lg
@@ -56,8 +56,8 @@
             <span>Proceed with payment</span>
         </button>
 
-        <button id="pay-button" type="submit" name="action" value="cancel-pay"
-            class="relative w-full px-6 py-3.5 bg-gradient-to-r 
+        <button type="submit" name="action" value="cancel-pay"
+            class="payment-intent-button relative w-full px-6 py-3.5 bg-gradient-to-r 
                 from-purple-500 to-pink-500 hover:from-purple-600 
                 hover:to-pink-600 text-white text-sm font-semibold 
                 rounded-xl shadow-lg hover:scale-[1.02] transition-all 
@@ -87,6 +87,11 @@
 <script name="stripe-payment-form" type="text/javascript">
 (() => {
 
+// ===============================
+// Handle - Stripe Payment Intent
+// ===============================
+
+
 // Initialize Stripe with your publishable key
 const stripe = Stripe('{{ stripe_public }}');
 // Create an instance of Elements
@@ -114,6 +119,10 @@ const card = elements.create('card', { style });
 // Add the Card Element to the page
 card.mount('#card-element');
 
+// Handle real-time validation errors
+card.on('change', (event) => {
+    eltError.textContent = (event.error) ? event.error.message : "";
+});
 
 
 
@@ -122,14 +131,24 @@ card.mount('#card-element');
 
 const form = document.getElementById("{{ target_form_id }}");
 const eltError = document.getElementById('card-errors');
+const eltPayment = form.querySelector('#payment');
 
 
+// ======================
+// Handle - HTMX Events
+// ======================
 
-// Handle real-time validation errors
-card.on('change', (event) => {
-    eltError.textContent = (event.error) ? event.error.message : "";
-});
 
+const mountPayment = (event) => {
+
+    const target = event?.target;
+    
+    if (target?.id !== "{{ target_form_id }}"
+    || !form.querySelector('#payment')) return;
+
+    paymentMounted(event);
+
+}
 
 
 const submitPayment = async (event) => {
@@ -137,7 +156,7 @@ const submitPayment = async (event) => {
     const submitter = event?.detail?.requestConfig?.triggeringEvent?.submitter;
 
     // GET server response: XHR, IF triggerEvent IS this btn. ELSE return
-    if (submitter?.id != 'pay-button') return;
+    if (submitter?.classList.contains('payment-intent-button') != true) return;
     
     xhr = event.detail.xhr;
     if (xhr.status < 200 || xhr.status >= 300) return;
@@ -145,7 +164,12 @@ const submitPayment = async (event) => {
     if (!contentType.includes('application/json')) return;
 
     const data = JSON.parse(xhr.responseText),
-    clientSecret = data.client_secret;
+    clientSecret = data?.client_secret;
+    
+    if (data?.success === 'Canceled payment') {
+        return paymentCanceled(event);
+    }
+    if (data?.success !== 'Paying') return;
 
     // Confirm the card payment
     const { error } = await stripe.confirmCardPayment(clientSecret, {
@@ -158,16 +182,49 @@ const submitPayment = async (event) => {
         // Handle errors from the stripe card payment
         eltError.textContent = error.message;
     } else {
-        paymentSuccess();
+        paymentSuccess(event);
     }
 
 }
 
-function paymentSuccess() {
+
+// ==========================
+// Handle - Dispatch Events
+// ==========================
+
+
+function paymentMounted(event) {
+
+    form.removeEventListener('htmx:afterSettle', mountPayment);
+    
+    // Dispatch event ONCE mounted
+    const evt = new CustomEvent('payment:mounted', {
+        detail: {
+            form: form,
+            elt: eltPayment,
+        }
+    });
+
+    form.dispatchEvent(evt);
+
+}
+
+function paymentSuccess(event) {
 
     card.clear();
     form.reset();
     form.removeEventListener('htmx:afterRequest', submitPayment);
+
+    // Dispatch event ON success
+    const evt = new CustomEvent('payment:success', {
+        detail: {
+            form: form,
+            elt: eltPayment,
+            submitter: event.submitter,
+        }
+    });
+
+    form.dispatchEvent(evt);
 
     {% if success_url %}
         window.location.href = "{{ success_url }}";
@@ -175,9 +232,32 @@ function paymentSuccess() {
 
 }
 
+function paymentCanceled(event) {
 
-// Handle form submission
-form.addEventListener('htmx:afterRequest', submitPayment);
+    form.removeEventListener('htmx:afterRequest', submitPayment);
+    form.querySelector('style[name="payment-intent"]')?.remove();
+    eltPayment.remove();
+
+    // Dispatch event AFTER removal
+    const evt = new CustomEvent('payment:canceled', {
+        detail: {
+            form: form,
+            removed: eltPayment,
+            submitter: event.submitter,
+        }
+    });
+
+    form.dispatchEvent(evt);
+
+}
+
+
+// ====================================
+// Set - HTMX Events + Dispatch Events
+// ====================================
+
+form.addEventListener('htmx:afterRequest', submitPayment); // removed once payment:canceled
+form.addEventListener('htmx:afterSettle', mountPayment); // removed once payment:mounted
 document.currentScript.remove();
 
 })();
